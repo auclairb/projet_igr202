@@ -1,0 +1,7 @@
+Article 3: Light Cuts.
+Pour ce projet, on pourra démarrer de la base de code du TP sur la synthèse
+d'image et se restreindre dans un premier temps à une solution de calcul de
+la radiance finale "par sommet".
+
+On pourra également utiliser la bibliothèque tinyobj pour charger des
+scènes intéressantes. L'ensemble de l'algorithme sera implémenté en C++.

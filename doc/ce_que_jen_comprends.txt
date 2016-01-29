@@ -1,0 +1,4 @@
+On fait des light clusters, qui approximent plein de lumières par une seule.
+
+On va créer un arbre de lumières (les terminaisons). Tous les noeuds
+intermédiaires seront des clusters de lumières.

@@ -9,8 +9,25 @@ Ouai et après on fait tourner un algo pour déterminer combien de lumière on p
 =======
 Les cuts vont permettre de faire une bonne approximation.
 
-La radiance L va être approximée. On va définir une lumière représentative, afin de réduire les calculs. On pré-stockera la valeur de l'intensité venant de cette LumRepr.
+La radiance L va être approximée. On va définir une lumière représentative, afin de réduire les calculs.
+On pré-stockera la valeur de l'intensité venant de cette LumRepr.
 
+Le ratio d'erreur dans la découpe des clusters sera de 2%
+
+COMMENT FAIRE UNE DECOUPE.
+On part de la racine. On calcule la radiance resultante et en même temps le
+bounding cluster error.
+
+COMMENT CONSTRUIRE LE LIGHT TREE
+Stocké dans un heap.
+On essaye de rassembler les lumières par proximité spatiale et orientation
+similaire.
+Si besoin, on sépare en 3 arbres suivant le type de lumière (omni, oriented, directional).
+--> on les utiliserait dans un même arbre, avec des cônes d'orientation etc. (pas sûr???)
+
+METRIQUE DE SIMILARITE (ie choix des paires de lights)
+Min Ic*( alphac² + c²(1 - cos Bc)²)
+on prendra c = 0 si lumière omni ou directionnelle
 
 A GERER :
 - il va falloir s'occuper des HDR environment maps (?)

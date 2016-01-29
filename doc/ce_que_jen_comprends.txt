@@ -2,3 +2,6 @@ On fait des light clusters, qui approximent plein de lumières par une seule.
 
 On va créer un arbre de lumières (les terminaisons). Tous les noeuds
 intermédiaires seront des clusters de lumières.
+
+// Benjamin
+Ouai et après on fait tourner un algo pour déterminer combien de lumière on peut enlever/approximer pour avoir le taux d'erreur que l'on veut

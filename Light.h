@@ -14,4 +14,6 @@ class Light{
   float angle;
 };
 
+void createLightTree(const vector<Light> & lightTable);
+
 #endif

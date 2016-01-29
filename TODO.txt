@@ -1,0 +1,11 @@
+*** OBJECTIFS DU RUSH ACTUEL ***
+- Finir l'algo Tree et le rendre fonctionnel.
+- Commencer à résoudre l'équation du rendu (les paramètres, Blinn-Phong etc)
+- Réaliser les cuts adéquats pour chaque pixel
+
+
+*** OBJECTIFS LOINTAINS ***
+- rajouter les lumières
+- Eclairage indirect
+- maîtriser tinyobj pour afficher des scènes complexes.
+- implémenter le reconstruction cut pour limiter l'aliasing

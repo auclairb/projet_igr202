@@ -5,6 +5,9 @@ intermédiaires seront des clusters de lumières.
 
 Les cuts vont permettre de faire une bonne approximation.
 
+La radiance L va être approximée. On va définir une lumière représentative, afin de réduire les calculs. On pré-stockera la valeur de l'intensité venant de cette LumRepr.
+
+
 A GERER :
 - il va falloir s'occuper des HDR environment maps (?)
 - l'éclairage indirect est géré avec l'Instant Radiosity pour être passé en

@@ -4,3 +4,8 @@ On va créer un arbre de lumières (les terminaisons). Tous les noeuds
 intermédiaires seront des clusters de lumières.
 
 Les cuts vont permettre de faire une bonne approximation.
+
+A GERER :
+- il va falloir s'occuper des HDR environment maps (?)
+- l'éclairage indirect est géré avec l'Instant Radiosity pour être passé en
+éclairage direct.

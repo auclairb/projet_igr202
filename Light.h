@@ -7,13 +7,12 @@ class Light{
  public:
   Light();
   virtual ~Light();
+  void createLightTree(const vector<Light> & lightTable);
+ 
  private:
   Vec3f pos;
   float intensity;
   Vec3f dir;
   float angle;
 };
-
-void createLightTree(const vector<Light> & lightTable);
-
 #endif

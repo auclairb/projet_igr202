@@ -33,11 +33,12 @@ void Light::createLightTree(const vector<Light> & lightTable){
 //store min and lightIndex with itIndex in distTable for couple closest neighbors
     distTable.push_back(make_tuple(min,index,lightIndex));
     }    
-  }
-  //Here the distTable is complete
 
-for(vector<tuple<float,float,float>>::iterator it = distTable.begins();it != distTable.end(); it++){
+  //Here the distTable is complete
+  int min = INFINITY;
+  for(vector<tuple<float,float,float>>::iterator it = distTable.begin();it != distTable.end(); it++){
     //prendre minimum
+    
     //clusteriser les 2 lumieres en une seule. (complexe ie trouver la + importante et virer l'autre)
 
     //comment stocker?

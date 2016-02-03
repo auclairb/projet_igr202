@@ -5,6 +5,7 @@
 
 using namespace std;
 
+
 class Light{
  private:
   Vec3f pos;
@@ -15,6 +16,6 @@ class Light{
  public:
   Light(Vec3f,float,Vec3f,Vec3f);
   virtual ~Light();
-  void createLightTree(const  vector<Light> & lightTable);
+  void createLightTree(const  vector<Light>  & lightTable);
 };
 #endif

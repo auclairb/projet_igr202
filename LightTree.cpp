@@ -1,41 +1,52 @@
 #include "LightTree.h"
 #include <stdlib.h>
+#include <list>
 
 using namespace std;
 typedef list<tuple<Light,Light,Light>> ltuplist;
 typedef tuple<float,Light,Light> ftup;
 typedef list<tuple<float,Light,Light>> ftuplist;
 
+list<Light> listCopy(vector<Light> & lightTable){
+  list<Light> list;
+  for(vector<Light>::const_iterator it = lightTable.begin(); it != lightTable.end(); it++){
+    list.push_back(*it);
+  }
+  return list;
+  }
+
 ///Function that builds a light Tree
 void LightTree::createLightTree(const vector<Light> & lightTable){
-
+  
+  const list<Light> lightTable1 = listCopy(lightTable);
   //get Neighbours table
-  ftuplist distTable = createNeighboursTable(lightTable);
+  ftuplist distTable = createNeighboursTable(lightTable1);
+  ltuplist clusterTable;
 
-  for(ftuplist::iterator it = distTable.begin();it != distTable.end(); it++){
-    //prendre minimum
-    
-    //clusteriser les 2 lumieres en une seule. (complexe ie trouver la + importante et virer l'autre)
-
-    //comment stocker?
-    //reiterer.
-    
+  while (!distTable.empty()){
+    Light cluster = createCluster(distTable, clusterTable);
+    Light lightOne = get<1>(distTable.front());
+    Light lightTwo = get<2>(distTable.front());
+    lightTable1.remove(lightOne);
+    lightTable1.remove(lightTwo);
+    lightTable1.push_back(cluster);
+    distTable = createNeighboursTable(lightTable1);
   }
 }
 
 ///Function that builds the closest neighbours list<tuple<float,float,float>> table
-ftuplist LightTree::createNeighboursTable(const vector<Light> & lightTable){
+ftuplist LightTree::createNeighboursTable(list<Light> & lightTable){
   //Output table
   ftuplist distTable;
   int index = 0;
   //Search the whole table
-  for(vector<Light>::const_iterator it = lightTable.begin(); it != lightTable.end()-1; it ++, index ++){
+  for(list<Light>::const_iterator it = lightTable.begin(); it != lightTable.end()-1; it ++, index ++){
     float min = INFINITY;
     int closestNeighbour = index;
     float distance = 0.0f;
     int index2 = 0;
     //Compare each Light to all other Lights
-    for(vector<Light>::const_iterator jt = lightTable.begin(); jt != lightTable.end(); jt ++, index2++){
+    for(list<Light>::const_iterator jt = lightTable.begin(); jt != lightTable.end(); jt ++, index2++){
       //If itself, ignore
       if(dist(it->getPos(), jt->getPos())==0){
 	continue;
@@ -57,7 +68,7 @@ ftuplist LightTree::createNeighboursTable(const vector<Light> & lightTable){
   return distTable;
 }
 
-void LightTree::createCluster(ftuplist disTable, ltuplist & clusterTable){
+Light LightTree::createCluster(ftuplist disTable, ltuplist & clusterTable){
   
   Light lightOne = get<1>(disTable.front());
   Light lightTwo = get<2>(disTable.front());
@@ -81,4 +92,5 @@ void LightTree::createCluster(ftuplist disTable, ltuplist & clusterTable){
 
   tuple<Light,Light,Light> clusterOne = make_tuple(cluster,lightOne,lightTwo) ;
   clusterTable.push_back(clusterOne);
+  return cluster;
 }

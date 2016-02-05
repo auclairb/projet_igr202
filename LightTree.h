@@ -14,9 +14,10 @@ class LightTree{
  public:
   LightTree();
   virtual ~LightTree(){};
-  void createLightTree(const vector<Light> & lightTable);
-  ftuplist createNeighboursTable(const vector<Light> & lightTable);
-  void createCluster(ftuplist disTable, ltuplist & clusterTable);
+  void createLightTree(const vector<Light> &);
+  list<Light> listCopy(const vector<Light> &);
+  ftuplist createNeighboursTable(const list<Light> &);
+  Light createCluster(ftuplist, ltuplist &);
   
 };
 #endif

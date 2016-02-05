@@ -16,11 +16,9 @@ class Light{
  public:
   Light(Vec3f,float,Vec3f,Vec3f);
   virtual ~Light();
-  Vec3f getPos();
-  float getIntensity();
-  Vec3f getDir();
-  Vec3f getAngle();
-  //void createLightTree(const  vector<Light>  & lightTable);
-  
+  Vec3f getPos()const;
+  float getIntensity()const;
+  Vec3f getDir()const;
+  Vec3f getAngle()const;
 };
 #endif

@@ -12,16 +12,16 @@ Light::Light(Vec3f _pos, float _intensity, Vec3f  _coneDir, Vec3f _coneAngle){
   this->angle = _coneAngle;
 }
 
-Vec3f Light::getPos(){
+Vec3f Light::getPos()const{
   return this->pos;
 }
-float Light::getIntensity(){
+float Light::getIntensity() const{
   return this->intensity;
 }
-Vec3f Light::getDir(){
+Vec3f Light::getDir() const{
   return this->dir;
 }
-Vec3f Light::getAngle(){
+Vec3f Light::getAngle() const{
   return this->angle;
 }
 

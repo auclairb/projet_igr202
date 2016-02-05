@@ -1,25 +1,21 @@
-CIBLE = main
-SRCS =  Main.cpp Camera.cpp Mesh.cpp Light.cpp LightTree.cpp
+EXE = main
+SRCS =  Camera.cpp Light.cpp LightTree.cpp Main.cpp Mesh.cpp Ray.cpp 
 LIBS =  -lglut -lGLU -lGL -lm 
-
 CC = g++
 CPP = g++
-
-FLAGS = -Wall -O2 -std=gnu++11
-
+FLAGS = -Wall -Werror -O2 -std=gnu++11
 CFLAGS = $(FLAGS)
 CXXFLAGS = $(FLAGS)
+OBJS = $(SRCS:.cpp=.o)
+.PHONY = clean
 
-OBJS = $(SRCS:.cpp=.o)   
+$(EXE): $(OBJS)
+	g++ $(LDFLAGS) -o $(EXE) $(OBJS) $(LIBS)
 
-$(CIBLE): $(OBJS)
-	g++ $(LDFLAGS) -o $(CIBLE) $(OBJS) $(LIBS)
+-include $(subst .c,.d,$(SOURCES))
+%.d : %.c
+	$(CC) $(CFLAGS) $(CPPFLAGS) $(TARGET_ARCH) -MM -MF $@ -MP $<
+
 clean:
-	rm -f  *~  $(CIBLE) $(OBJS)
-
-Camera.o: Camera.cpp Camera.h Vec3.h
-Mesh.o: Mesh.cpp Mesh.h Vec3.h
-Main.o: Main.cpp Vec3.h Camera.h Mesh.h
-
-
+	- rm -f  *~  $(EXE) $(OBJS) *.d
 

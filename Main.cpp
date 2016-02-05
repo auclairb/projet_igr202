@@ -1,5 +1,5 @@
 // ----------------------------------------------
-// Informatique Graphique 3D & RÈalitÈ Virtuelle.
+// Informatique Graphique 3D & R√©alit√© Virtuelle.
 // Travaux Pratiques
 // Algorithmes de Rendu
 // Copyright (C) 2015 Tamy Boubekeur
@@ -18,7 +18,7 @@
 #include "Vec3.h"
 #include "Camera.h"
 #include "Mesh.h"
-#include "Light.h"
+#include "Ray.h"
 
 using namespace std;
 
@@ -33,6 +33,16 @@ static bool fullScreen = false;
 
 static Camera camera;
 static Mesh mesh;
+//Adding new static variables
+static Vec3f lightPos(5.0f,0.0f,0.0f);
+static Vec3f kd (0.9f,0.5f,0.1f);
+//static float ks = 1.0f;
+//static float s = 10.0f;
+static float alpha = 0.1f;  //rugosit√© 0 =< alpha =< 1
+static float F0 = 0.03f; //Terme de Fresnel [0.02, 0.05] plastique [0.91,0.92] alu
+static	int* result;
+static int N = 0;
+
 
 void printUsage () {
 	std::cerr << std::endl 
@@ -49,27 +59,109 @@ void printUsage () {
          << " q, <esc>: Quit" << std::endl << std::endl; 
 }
 
+void allIntersects(Mesh& mesh){
+  result = new int[mesh.V.size()];
+  for (unsigned int i = 0; i < mesh.V.size (); i++)  {
+    cout << i << endl;        
+    const Vertex & v = mesh.V[i];
+    Vec3f wi = (lightPos-v.p);
+    wi.normalize();
+    Ray ray = Ray(v.p,wi);
+
+    if(ray.intersects(mesh)){
+      result[i] = 1;
+    }
+    else {
+      result[i] = 0;
+       Vec3f result(0.0f,0.0f,0.0f) ;
+      result = cartesianToPolar(v.n);
+      for (int i=0; i<N; i++){
+	float theta = result[1] + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX/M_PI/2));
+	float phi = result[2] + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX/(2*M_PI)));
+	Vec3f randDir (1.0f,theta,phi);
+	randDir = polarToCartesian(randDir);
+	Ray randRay = Ray(v.p, randDir);
+	if(randRay.intersects(mesh)){
+	  result[i] += 1/N;
+	}
+      }
+    }
+  }
+}
+
 void init (const char * modelFilename) {
     glCullFace (GL_BACK);     // Specifies the faces to cull (here the ones pointing away from the camera)
     glEnable (GL_CULL_FACE); // Enables face culling (based on the orientation defined by the CW/CCW enumeration).
     glDepthFunc (GL_LESS); // Specify the depth test for the z-buffer
     glEnable (GL_DEPTH_TEST); // Enable the z-buffer in the rasterization
-	glLineWidth (2.0); // Set the width of edges in GL_LINE polygon mode
+    glLineWidth (2.0); // Set the width of edges in GL_LINE polygon mode
     glClearColor (0.0f, 0.0f, 0.0f, 1.0f); // Background color
     glClearColor (0.0f, 0.0f, 0.0f, 1.0f);
-	
-	mesh.loadOFF (modelFilename);
-    camera.resize (DEFAULT_SCREENWIDTH, DEFAULT_SCREENHEIGHT);
+    mesh.loadOFF(modelFilename);
+    camera.resize (DEFAULT_SCREENWIDTH, DEFAULT_SCREENHEIGHT);   
+    allIntersects(mesh);
 }
+ 
+
+
 
 void drawScene () {
     glBegin (GL_TRIANGLES);
     for (unsigned int i = 0; i < mesh.T.size (); i++) 
         for (unsigned int j = 0; j < 3; j++) {
             const Vertex & v = mesh.V[mesh.T[i].v[j]];
-            // EXERCISE : the following color response shall be replaced with a proper reflectance evaluation/shadow test/etc.
-			glColor3f (1.0, 1.0, 1.0);
             
+            // EXERCISE : the following color response shall be replaced with a proper reflectance evaluation/shadow test/etc.
+            float w0f[3] = {0.0f,0.0f,0.0f};
+            camera.getPos(w0f[0],w0f[1],w0f[2]);
+            Vec3f w0(w0f[0],w0f[1],w0f[2]);
+            w0 = w0 - v.p;
+            w0.normalize();
+            Ray ray = Ray(v.p,w0);
+            
+            if(result[mesh.T[i].v[j]] ){
+                glColor3f (0.0f, 0.0f, 0.0f);
+            }
+            else {
+                Vec3f wi = (lightPos-v.p);
+                wi.normalize();
+                Vec3f wH = w0 + wi;
+                wH.normalize();  
+                float fs = 0.0f;
+                
+                // Implementing Lambert
+                //float color = max(0.0f,dot(wi,v.n))*(kd/M_PI);
+                
+                //Implementing Blinn-Phong
+                //fs = pow( ks*dot(wH,v.n), s);
+			
+		//Implementing Cook-Torrance
+		/*
+		  float expTerm = (pow(dot(v.n,wH),2) - 1) / (pow(alpha,2)*pow(dot(v.n,wH),2));
+		  float inv = M_PI*pow(alpha,2)*pow(dot(v.n,wH),4); 
+		  float D = 1/(inv)*exp(expTerm); 
+		  float F = F0 + (1 - F0) * pow(1 - max(0.0f,dot(wi,wH)),5);
+		  float gShadow = (2*dot(v.n,wH)*dot(v.n,wi)) / dot(w0,wH);
+		  float gMask =   (2*dot(v.n,wH)*dot(v.n,w0)) / dot(w0,wH);
+		  float G = min(1.0f,gShadow);
+		  G = min(G,gMask);
+		  fs = (D*F*G)/ (4*dot(v.n,wi)*dot(v.n,w0));
+		*/
+			
+		//Implementing GGX
+		float Dx = pow(alpha,2) / (M_PI * pow(1+(pow(alpha,2)-1)*pow(dot(v.n,wH),2),2));
+		float Fx = F0 + (1 - F0) * pow(1 - max(0.0f,dot(wi,wH)),5);
+		float Gi = 2*dot(v.n,wi) / (  dot(v.n,wi) + sqrt( pow(alpha,2) + (1 - pow(alpha,2))*pow(dot(v.n,wi),2) )  );
+		float G0 = 2*dot(v.n,w0) / (  dot(v.n,w0) + sqrt( pow(alpha,2) + (1 - pow(alpha,2))*pow(dot(v.n,w0),2) )  );
+		float Gx = Gi*G0;
+		fs = (Dx*Fx*Gx)/ (4*dot(v.n,wi)*dot(v.n,w0));
+			
+		//Resulting
+		Vec3f fsVec(fs);
+		Vec3f color = max(0.0f,dot(wi,v.n))*(kd/M_PI + fs );
+		glColor3f (color[0], color[1], color[2]);
+            }
+                        
             glNormal3f (v.n[0], v.n[1], v.n[2]); // Specifies current normal vertex   
             glVertex3f (v.p[0], v.p[1], v.p[2]); // Emit a vertex (one triangle is emitted each time 3 vertices are emitted)
         }

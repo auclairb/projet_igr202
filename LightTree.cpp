@@ -1,5 +1,4 @@
 #include "LightTree.h"
-#include <list>
 
 using namespace std;
 
@@ -47,5 +46,5 @@ ftuplist LightTree::createNeighboursTable(const vector<Light> & lightTable){
     distTable.push_back(make_tuple(min,index,lightIndex));
     }
 
-  thelist.sort([](const ipair & a, const ipair & b) { return a.first < b.first; });
+  distTable.sort([](const ftup & a, const ftup & b) { return get<0>(a) < get<0>(b); });
 }

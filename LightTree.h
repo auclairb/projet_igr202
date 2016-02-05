@@ -2,9 +2,11 @@
 #define LIGHTTREE_H
 #include <vector>
 #include <tuple>
+#include <list>
 #include "Light.h"
 using namespace std;
 
+typedef tuple<float,float,float> ftup;
 typedef list<tuple<float,float,float>> ftuplist;
 
 class LightTree{

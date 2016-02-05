@@ -7,46 +7,60 @@ typedef list<tuple<Light,Light,Light>> ltuplist;
 typedef tuple<float,Light,Light> ftup;
 typedef list<tuple<float,Light,Light>> ftuplist;
 
-list<Light> listCopy(vector<Light> & lightTable){
+///Function that turns a vector into a list
+list<Light> LightTree::vecToList(const vector<Light> & vec){
   list<Light> list;
-  for(vector<Light>::const_iterator it = lightTable.begin(); it != lightTable.end(); it++){
+  for(vector<Light>::const_iterator it = vec.begin(); it != vec.end(); it++){
     list.push_back(*it);
   }
   return list;
+
+}
+
+///Function that turns a list into a vector
+vector<Light> LightTree::listToVec(const list<Light> & liste){
+
+  vector<Light> vec;
+  for(list<Light>::const_iterator it = liste.begin(); it != liste.end(); it++){
+    vec.push_back(*it);
   }
+  return vec;
+
+}
+
 
 ///Function that builds a light Tree
-void LightTree::createLightTree(const vector<Light> & lightTable){
-  
-  const list<Light> lightTable1 = listCopy(lightTable);
+void LightTree::createLightTree(const list<Light> & lightTable){ 
+  /*
+  list<Light> lightTable1 = lightTable;
   //get Neighbours table
   ftuplist distTable = createNeighboursTable(lightTable1);
   ltuplist clusterTable;
 
   while (!distTable.empty()){
     Light cluster = createCluster(distTable, clusterTable);
-    Light lightOne = get<1>(distTable.front());
-    Light lightTwo = get<2>(distTable.front());
+    const Light lightOne = get<1>(distTable.front());
+    const Light lightTwo = get<2>(distTable.front());
     lightTable1.remove(lightOne);
     lightTable1.remove(lightTwo);
     lightTable1.push_back(cluster);
     distTable = createNeighboursTable(lightTable1);
-  }
+    }*/
 }
 
 ///Function that builds the closest neighbours list<tuple<float,float,float>> table
-ftuplist LightTree::createNeighboursTable(list<Light> & lightTable){
+ftuplist LightTree::createNeighboursTable(const vector<Light> & lightTable){
   //Output table
   ftuplist distTable;
   int index = 0;
   //Search the whole table
-  for(list<Light>::const_iterator it = lightTable.begin(); it != lightTable.end()-1; it ++, index ++){
+  for(vector<Light>::const_iterator it = lightTable.begin(); it != lightTable.end()-1; it ++, index ++){
     float min = INFINITY;
     int closestNeighbour = index;
     float distance = 0.0f;
     int index2 = 0;
     //Compare each Light to all other Lights
-    for(list<Light>::const_iterator jt = lightTable.begin(); jt != lightTable.end(); jt ++, index2++){
+    for(vector<Light>::const_iterator jt = lightTable.begin(); jt != lightTable.end(); jt ++, index2++){
       //If itself, ignore
       if(dist(it->getPos(), jt->getPos())==0){
 	continue;

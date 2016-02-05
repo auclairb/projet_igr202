@@ -14,7 +14,7 @@ class Light{
   Vec3f angle;
 
  public:
-  Light();
+  Light(){};
   Light(Vec3f,float,Vec3f,Vec3f);
   virtual ~Light(){};
   Vec3f getPos()const;

@@ -1,7 +1,8 @@
 #include "LightTree.h"
+#include <stdlib.h>
 
 using namespace std;
-
+typedef list<tuple<Light,Light,Light>> ltuplist;
 typedef tuple<float,Light,Light> ftup;
 typedef list<tuple<float,Light,Light>> ftuplist;
 
@@ -54,4 +55,30 @@ ftuplist LightTree::createNeighboursTable(const vector<Light> & lightTable){
 
   distTable.sort([](const ftup & a, const ftup & b) { return get<0>(a) < get<0>(b); });
   return distTable;
+}
+
+void LightTree::createCluster(ftuplist disTable, ltuplist & clusterTable){
+  
+  Light lightOne = get<1>(disTable.front());
+  Light lightTwo = get<2>(disTable.front());
+  Light cluster;
+
+  float intensityOne = lightOne.getIntensity();
+  float intensityTwo = lightTwo.getIntensity();
+  float intensity = intensityOne+intensityTwo;
+
+  float probOne = intensityOne / intensity;
+
+  float prob = (rand() % 1000)/1000;
+
+  if (prob <= probOne){
+    cluster = lightOne;
+  } else {
+    cluster = lightTwo;
+  }
+
+  cluster.setIntensity(intensity);
+
+  tuple<Light,Light,Light> clusterOne = make_tuple(cluster,lightOne,lightTwo) ;
+  clusterTable.push_back(clusterOne);
 }

@@ -8,6 +8,7 @@ using namespace std;
 
 typedef tuple<float,Light,Light> ftup;
 typedef list<tuple<float,Light,Light>> ftuplist;
+typedef list<tuple<Light, Light,Light>> ltuplist;
 
 class LightTree{
  public:
@@ -15,6 +16,7 @@ class LightTree{
   virtual ~LightTree(){};
   void createLightTree(const vector<Light> & lightTable);
   ftuplist createNeighboursTable(const vector<Light> & lightTable);
+  void createCluster(ftuplist disTable, ltuplist & clusterTable);
   
 };
 #endif

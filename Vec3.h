@@ -33,6 +33,12 @@ public:
 	p[1] = p1;
 	p[2] = p2; 
   };
+  
+  inline Vec3 (T p0) { 
+	p[0] = p0;
+	p[1] = p0;
+	p[2] = p0; 
+  };
 
   inline Vec3 (const Vec3 & v) {
 	init (v[0], v[1], v[2]);
@@ -286,7 +292,7 @@ inline Vec3<T> interpolate (const Vec3<T> & u, const Vec3<T> & v, float alpha) {
 template <class T>
 inline Vec3<T> cartesianToPolar (const Vec3<T> & v) {
       Vec3<T> polar;
-      polar[0] = v.getLength();
+      polar[0] = v.length();
 
       if (v[2] > 0.0f) {
         polar[1] = (T) atan (sqrt (v[0] * v[0] + v[1] * v[1]) / v[2]);

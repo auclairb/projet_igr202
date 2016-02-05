@@ -1,6 +1,5 @@
 #include "Light.h"
 #include "Vec3.h"
-#include <tuple>
 
 extern Light * lightTable;
 
@@ -13,16 +12,16 @@ Light::Light(Vec3f _pos, float _intensity, Vec3f  _coneDir, Vec3f _coneAngle){
   this->angle = _coneAngle;
 }
 
-Vec3f getPos(){
+Vec3f Light::getPos(){
   return this->pos;
 }
-float getIntensity(){
+float Light::getIntensity(){
   return this->intensity;
 }
-Vec3f getDir(){
+Vec3f Light::getDir(){
   return this->dir;
 }
-Vec3f getAngle(){
+Vec3f Light::getAngle(){
   return this->angle;
 }
 

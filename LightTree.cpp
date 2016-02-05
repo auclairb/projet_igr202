@@ -1,6 +1,8 @@
 #include "LightTree.h"
+#include <tuple>
 
-void createLightTree(const vector<Light> & lightTable){
+using namespace std;
+void LightTree::createLightTree(const vector<Light> & lightTable){
   // (distance, closestNeighbour1Index, closestNeighbour2Index)
   vector<tuple<float,float,float>> distTable;
   int index = 0;
@@ -13,7 +15,7 @@ void createLightTree(const vector<Light> & lightTable){
     int index2 = index;
     for(vector<Light>::const_iterator jt = it+1; jt != lightTable.end(); jt ++, index2++){
       //calcule distance de it.pos à jt.pos
-      distance = dist(it->pos, jt->pos);
+      distance = dist(it->getPos(), jt->getPos());
       //if (distance < min) min = distance & lightIndex = actualIndex
       if(distance < min)
 	{
@@ -26,7 +28,7 @@ void createLightTree(const vector<Light> & lightTable){
     }    
 
   //Here the distTable is complete
-  int min = INFINITY;
+  float min = INFINITY;
   for(vector<tuple<float,float,float>>::iterator it = distTable.begin();it != distTable.end(); it++){
     //prendre minimum
     

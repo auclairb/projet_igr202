@@ -1,4 +1,9 @@
 #ifndef LIGHTTREE_H
 #define LIGHTTREE_H
-void createLightTree(const vector<Light> & lightTable);
+#include <vector>
+#include "Light.h"
+class LightTree{
+ public:
+  void createLightTree(const vector<Light> & lightTable);
+};
 #endif

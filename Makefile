@@ -5,7 +5,7 @@ LIBS =  -lglut -lGLU -lGL -lm
 CC = g++
 CPP = g++
 
-FLAGS = -Wall -O2 
+FLAGS = -Wall -O2 -std=gnu++11
 
 CFLAGS = $(FLAGS)
 CXXFLAGS = $(FLAGS)

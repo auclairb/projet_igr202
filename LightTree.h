@@ -6,11 +6,13 @@
 #include "Light.h"
 using namespace std;
 
-typedef tuple<float,float,float> ftup;
-typedef list<tuple<float,float,float>> ftuplist;
+typedef tuple<float,Light,Light> ftup;
+typedef list<tuple<float,Light,Light>> ftuplist;
 
 class LightTree{
  public:
+  LightTree();
+  virtual ~LightTree(){};
   void createLightTree(const vector<Light> & lightTable);
   ftuplist createNeighboursTable(const vector<Light> & lightTable);
   

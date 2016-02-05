@@ -2,12 +2,15 @@
 
 using namespace std;
 
+typedef tuple<float,Light,Light> ftup;
+typedef list<tuple<float,Light,Light>> ftuplist;
+
+///Function that builds a light Tree
 void LightTree::createLightTree(const vector<Light> & lightTable){
-  // (distance, closestNeighbour1Index, closestNeighbour2Index)
-      
+
+  //get Neighbours table
   ftuplist distTable = createNeighboursTable(lightTable);
-  //Here the distTable is complete
-  float min = INFINITY;
+
   for(ftuplist::iterator it = distTable.begin();it != distTable.end(); it++){
     //prendre minimum
     
@@ -19,32 +22,36 @@ void LightTree::createLightTree(const vector<Light> & lightTable){
   }
 }
 
+///Function that builds the closest neighbours list<tuple<float,float,float>> table
 ftuplist LightTree::createNeighboursTable(const vector<Light> & lightTable){
+  //Output table
   ftuplist distTable;
   int index = 0;
+  //Search the whole table
   for(vector<Light>::const_iterator it = lightTable.begin(); it != lightTable.end()-1; it ++, index ++){
-
-    //Supposed to be INFINITY WIP !!
     float min = INFINITY;
-    float lightIndex = index;
+    int closestNeighbour = index;
     float distance = 0.0f;
     int index2 = 0;
+    //Compare each Light to all other Lights
     for(vector<Light>::const_iterator jt = lightTable.begin(); jt != lightTable.end(); jt ++, index2++){
+      //If itself, ignore
       if(dist(it->getPos(), jt->getPos())==0){
 	continue;
       }
-      //calcule distance de it.pos à jt.pos
+      //Compute distance
       distance = dist(it->getPos(), jt->getPos());
-      //if (distance < min) min = distance & lightIndex = actualIndex
-      if(distance < min && distance != 0)
+      //Store it as closest neighbour if conditions are met
+      if(distance < min && distance >0)
 	{
 	  min = distance;
-	  lightIndex = index2;
+	  closestNeighbour = index2;
 	}
       }
-//store min and lightIndex with itIndex in distTable for couple closest neighbors
-    distTable.push_back(make_tuple(min,index,lightIndex));
+    //Store (distanceValue, Light1, Light2) as closest neighbours
+    distTable.push_back(make_tuple(min,lightTable.at(index),lightTable.at(closestNeighbour)));
     }
 
   distTable.sort([](const ftup & a, const ftup & b) { return get<0>(a) < get<0>(b); });
+  return distTable;
 }

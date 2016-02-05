@@ -18,6 +18,11 @@ Vec3f Light::getPos()const{
 float Light::getIntensity() const{
   return this->intensity;
 }
+
+void Light::setIntensity(float _intensity){
+  this->intensity = _intensity;
+}
+
 Vec3f Light::getDir() const{
   return this->dir;
 }

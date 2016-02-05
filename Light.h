@@ -19,6 +19,7 @@ class Light{
   virtual ~Light(){};
   Vec3f getPos()const;
   float getIntensity()const;
+  void setIntensity(float);
   Vec3f getDir()const;
   Vec3f getAngle()const;
 };

@@ -4,8 +4,8 @@
 
 using namespace std;
 typedef list<tuple<Light,Light,Light>> ltuplist;
-typedef tuple<float,Light,Light> ftup;
-typedef list<tuple<float,Light,Light>> ftuplist;
+typedef tuple<float,float,float> ftup;
+typedef list<tuple<float,float,float>> ftuplist;
 
 ///Function that turns a vector into a list
 list<Light> LightTree::vecToList(const vector<Light> & vec){
@@ -30,22 +30,21 @@ vector<Light> LightTree::listToVec(const list<Light> & liste){
 
 
 ///Function that builds a light Tree
-void LightTree::createLightTree(const list<Light> & lightTable){ 
-  /*
-  list<Light> lightTable1 = lightTable;
+void LightTree::createLightTree(const vector<Light> & lightTable){ 
+  vector<Light> lightTable1 = lightTable;
   //get Neighbours table
   ftuplist distTable = createNeighboursTable(lightTable1);
   ltuplist clusterTable;
-
+  
   while (!distTable.empty()){
-    Light cluster = createCluster(distTable, clusterTable);
-    const Light lightOne = get<1>(distTable.front());
-    const Light lightTwo = get<2>(distTable.front());
-    lightTable1.remove(lightOne);
-    lightTable1.remove(lightTwo);
+    Light cluster = createCluster(distTable, clusterTable,lightTable1);
+    vector<Light>::iterator lightOne = lightTable1.begin() + get<1>(distTable.front());
+    vector<Light>::iterator lightTwo = lightTable1.begin() + get<2>(distTable.front());
+    lightTable1.erase(lightOne);
+    lightTable1.erase(lightTwo);
     lightTable1.push_back(cluster);
     distTable = createNeighboursTable(lightTable1);
-    }*/
+    }
 }
 
 ///Function that builds the closest neighbours list<tuple<float,float,float>> table
@@ -74,18 +73,18 @@ ftuplist LightTree::createNeighboursTable(const vector<Light> & lightTable){
 	  closestNeighbour = index2;
 	}
       }
-    //Store (distanceValue, Light1, Light2) as closest neighbours
-    distTable.push_back(make_tuple(min,lightTable.at(index),lightTable.at(closestNeighbour)));
+    //Store (distanceValue, index1, index2) as closest neighbours
+    distTable.push_back(make_tuple(min,index,closestNeighbour));
     }
 
   distTable.sort([](const ftup & a, const ftup & b) { return get<0>(a) < get<0>(b); });
   return distTable;
 }
 
-Light LightTree::createCluster(ftuplist disTable, ltuplist & clusterTable){
+Light LightTree::createCluster(ftuplist disTable, ltuplist & clusterTable, vector<Light> & lightTable){
   
-  Light lightOne = get<1>(disTable.front());
-  Light lightTwo = get<2>(disTable.front());
+  Light lightOne = lightTable.at(get<1>(disTable.front()));
+  Light lightTwo = lightTable.at(get<2>(disTable.front()));
   Light cluster;
 
   float intensityOne = lightOne.getIntensity();

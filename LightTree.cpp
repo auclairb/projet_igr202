@@ -1,12 +1,27 @@
 #include "LightTree.h"
-#include <tuple>
+#include <list>
 
 using namespace std;
 
-
 void LightTree::createLightTree(const vector<Light> & lightTable){
   // (distance, closestNeighbour1Index, closestNeighbour2Index)
-  vector<tuple<float,float,float>> distTable;
+      
+  ftuplist distTable = createNeighboursTable(lightTable);
+  //Here the distTable is complete
+  float min = INFINITY;
+  for(ftuplist::iterator it = distTable.begin();it != distTable.end(); it++){
+    //prendre minimum
+    
+    //clusteriser les 2 lumieres en une seule. (complexe ie trouver la + importante et virer l'autre)
+
+    //comment stocker?
+    //reiterer.
+    
+  }
+}
+
+ftuplist LightTree::createNeighboursTable(const vector<Light> & lightTable){
+  ftuplist distTable;
   int index = 0;
   for(vector<Light>::const_iterator it = lightTable.begin(); it != lightTable.end()-1; it ++, index ++){
 
@@ -30,17 +45,7 @@ void LightTree::createLightTree(const vector<Light> & lightTable){
       }
 //store min and lightIndex with itIndex in distTable for couple closest neighbors
     distTable.push_back(make_tuple(min,index,lightIndex));
-    }    
+    }
 
-  //Here the distTable is complete
-  float min = INFINITY;
-  for(vector<tuple<float,float,float>>::iterator it = distTable.begin();it != distTable.end(); it++){
-    //prendre minimum
-    
-    //clusteriser les 2 lumieres en une seule. (complexe ie trouver la + importante et virer l'autre)
-
-    //comment stocker?
-    //reiterer.
-    
-  }
+  thelist.sort([](const ipair & a, const ipair & b) { return a.first < b.first; });
 }

@@ -3,10 +3,9 @@ On fait des light clusters, qui approximent plein de lumières par une seule.
 On va créer un arbre de lumières (les terminaisons). Tous les noeuds
 intermédiaires seront des clusters de lumières.
 
-<<<<<<< HEAD
 // Benjamin
-Ouai et après on fait tourner un algo pour déterminer combien de lumière on peut enlever/approximer pour avoir le taux d'erreur que l'on veut
-=======
+Après on fait tourner un algo pour déterminer combien de lumière on peut enlever/approximer pour avoir le taux d'erreur que l'on veut
+
 Les cuts vont permettre de faire une bonne approximation.
 
 La radiance L va être approximée. On va définir une lumière représentative, afin de réduire les calculs.
@@ -33,4 +32,3 @@ A GERER :
 - il va falloir s'occuper des HDR environment maps (?)
 - l'éclairage indirect est géré avec l'Instant Radiosity pour être passé en
 éclairage direct.
->>>>>>> 6596d83e966a829f74789b6a242db304de769c4e

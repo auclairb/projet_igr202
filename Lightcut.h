@@ -13,6 +13,6 @@ class Lightcut{
   Lightcut(){};
   virtual ~Lightcut(){};
   void allIntersects(Mesh& mesh,const vector<Light> &,int * &);
-  void buildLightcut(ltuplist & );
+  void buildLightcut(ltuplist &, Mesh & mesh, const vector<Light> &,float);
 };
 #endif

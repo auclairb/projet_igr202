@@ -44,6 +44,6 @@ void Lightcut::allIntersects(Mesh& mesh, const vector<Light> & lightTable, int *
 }
 
 
-void Lightcut::buildLightcut(ltuplist & clusterTable){
-  
+void Lightcut::buildLightcut(ltuplist & clusterTable, Mesh& mesh, const vector<Light> & lightTable, float error){
+  this->allIntersects(mesh, lightTable, result);
 }

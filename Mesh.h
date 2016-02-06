@@ -19,7 +19,15 @@
 #pragma once
 #include <cmath>
 #include <vector>
+
+#include <utility>
 #include "Vec3.h"
+#include "tiny_obj_loader.h"
+
+struct pairUV {
+  float first;
+  float second;
+};
 
 /// A simple vertex class storing position and normal
 class Vertex {
@@ -65,6 +73,9 @@ public:
 
     /// Loads the mesh from a <file>.off
 	void loadOFF (const std::string & filename);
+	
+    ///Loads the mesh from a shape and materials extracted from a .obj file
+	void loadOBJMesh (const std::vector<tinyobj::shape_t> & shapes, std::vector<unsigned int> & material_ids, std::vector<pairUV> & coord_uv);
     
     /// Compute smooth per-vertex normals
     void recomputeNormals ();

@@ -46,6 +46,73 @@ void Mesh::loadOFF (const std::string & filename) {
     recomputeNormals ();
 }
 
+void Mesh::loadOBJMesh (const std::vector<tinyobj::shape_t> & shapes, std::vector<unsigned int> & material_ids, std::vector<pairUV> & coord_uv) {
+  int num_of_vertex = 0; //total number of vertices
+  int num_of_faces = 0; //total number of faces
+  
+  for (unsigned int i = 0; i < shapes.size(); i++)
+  {
+    num_of_vertex += shapes[i].mesh.positions.size()/3;
+    num_of_faces += shapes[i].mesh.indices.size()/3;
+  }
+  V.resize(num_of_vertex);
+  T.resize(num_of_faces);
+  material_ids.resize(num_of_faces);
+  coord_uv.resize(num_of_faces*3);
+  
+  int total_vert = 0;
+  int total_face = 0;
+  for (unsigned int i = 0; i < shapes.size(); i++) //for each shape in the mesh
+  {
+    
+    for (unsigned int j = 0; j < shapes[i].mesh.positions.size() / 3; j++) //get positions and separate into vertices
+    {
+      float x = shapes[i].mesh.positions[3*j+0];
+      float y = shapes[i].mesh.positions[3*j+1];
+      float z = shapes[i].mesh.positions[3*j+2];    
+      Vec3f pos(x, y, z);
+
+      V[j + total_vert].p = pos;
+    }
+    
+    for (unsigned int t = 0; t < shapes[i].mesh.indices.size() / 3; t++) //get indexes and separate into faces
+    {
+      int v1 = shapes[i].mesh.indices[3*t+0] + total_vert;
+      int v2 = shapes[i].mesh.indices[3*t+1] + total_vert;
+      int v3 = shapes[i].mesh.indices[3*t+2] + total_vert;
+      Triangle tri(v1, v2, v3);
+      
+      if (shapes[i].mesh.texcoords.size() > 0)
+      {
+	float u1 = shapes[i].mesh.texcoords[2*shapes[i].mesh.indices[3*t+0] + 0];
+	float v1 = shapes[i].mesh.texcoords[2*shapes[i].mesh.indices[3*t+0] + 1];
+	float u2 = shapes[i].mesh.texcoords[2*shapes[i].mesh.indices[3*t+1] + 0];
+	float v2 = shapes[i].mesh.texcoords[2*shapes[i].mesh.indices[3*t+1] + 1];
+	float u3 = shapes[i].mesh.texcoords[2*shapes[i].mesh.indices[3*t+2] + 0];
+	float v3 = shapes[i].mesh.texcoords[2*shapes[i].mesh.indices[3*t+2] + 1];
+	
+	pairUV uv1, uv2, uv3;
+	uv1.first = u1; uv1.second = v1;
+	uv2.first = u2; uv2.second = v2;
+	uv3.first = u3; uv3.second = v3;
+	
+	coord_uv[(t+total_face)*3 + 0] = uv1;
+	coord_uv[(t+total_face)*3 + 1] = uv2;
+	coord_uv[(t+total_face)*3 + 2] = uv3;
+      }
+      
+      T[t + total_face] = tri;
+      material_ids[t + total_face] = shapes[i].mesh.material_ids[t];
+    }
+    total_vert += shapes[i].mesh.positions.size() / 3;
+    total_face += shapes[i].mesh.indices.size() / 3;
+  }
+  
+  centerAndScaleToUnit();
+  recomputeNormals();
+  
+}
+
 void Mesh::recomputeNormals () {
     for (unsigned int i = 0; i < V.size (); i++)
         V[i].n = Vec3f (0.0, 0.0, 0.0);

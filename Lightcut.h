@@ -3,14 +3,16 @@
 #include "LightTree.h"
 #include <tuple>
 #include <list>
+#include "Mesh.h"
 using namespace std;
 typedef list<tuple<Light,Light,Light>> ltuplist;
 
 class Lightcut{
 
  public:
-  Lightcut();
+  Lightcut(){};
   virtual ~Lightcut(){};
+  void allIntersects(Mesh& mesh,const vector<Light> & lightTable);
   void buildLightcut(ltuplist & );
 };
 #endif

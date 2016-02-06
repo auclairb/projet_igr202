@@ -19,6 +19,7 @@
 #include "Camera.h"
 #include "Mesh.h"
 #include "Ray.h"
+#include "Lightcut.h"
 
 using namespace std;
 
@@ -40,8 +41,8 @@ static Vec3f kd (0.9f,0.5f,0.1f);
 //static float s = 10.0f;
 static float alpha = 0.1f;  //rugosité 0 =< alpha =< 1
 static float F0 = 0.03f; //Terme de Fresnel [0.02, 0.05] plastique [0.91,0.92] alu
-static	int* result;
-static int N = 0;
+int* result;
+//Lightcut * lightcut = new Lightcut();
 
 
 void printUsage () {
@@ -59,35 +60,7 @@ void printUsage () {
          << " q, <esc>: Quit" << std::endl << std::endl; 
 }
 
-void allIntersects(Mesh& mesh){
-  result = new int[mesh.V.size()];
-  for (unsigned int i = 0; i < mesh.V.size (); i++)  {
-    cout << i << endl;        
-    const Vertex & v = mesh.V[i];
-    Vec3f wi = (lightPos-v.p);
-    wi.normalize();
-    Ray ray = Ray(v.p,wi);
 
-    if(ray.intersects(mesh)){
-      result[i] = 1;
-    }
-    else {
-      result[i] = 0;
-       Vec3f result(0.0f,0.0f,0.0f) ;
-      result = cartesianToPolar(v.n);
-      for (int i=0; i<N; i++){
-	float theta = result[1] + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX/M_PI/2));
-	float phi = result[2] + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX/(2*M_PI)));
-	Vec3f randDir (1.0f,theta,phi);
-	randDir = polarToCartesian(randDir);
-	Ray randRay = Ray(v.p, randDir);
-	if(randRay.intersects(mesh)){
-	  result[i] += 1/N;
-	}
-      }
-    }
-  }
-}
 
 void init (const char * modelFilename) {
     glCullFace (GL_BACK);     // Specifies the faces to cull (here the ones pointing away from the camera)
@@ -99,7 +72,7 @@ void init (const char * modelFilename) {
     glClearColor (0.0f, 0.0f, 0.0f, 1.0f);
     mesh.loadOFF(modelFilename);
     camera.resize (DEFAULT_SCREENWIDTH, DEFAULT_SCREENHEIGHT);   
-    allIntersects(mesh);
+    //lightcut->allIntersects(mesh);
 }
  
 

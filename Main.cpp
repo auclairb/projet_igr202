@@ -42,6 +42,7 @@ static Vec3f kd (0.9f,0.5f,0.1f);
 static float alpha = 0.1f;  //rugosité 0 =< alpha =< 1
 static float F0 = 0.03f; //Terme de Fresnel [0.02, 0.05] plastique [0.91,0.92] alu
 int* result;
+int* test;
 //Lightcut * lightcut = new Lightcut();
 
 

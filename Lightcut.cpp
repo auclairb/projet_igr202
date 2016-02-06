@@ -4,10 +4,11 @@
 
 using namespace std;
 extern int * result;
+extern int * test;
 //static int N; used for AO
 typedef list<tuple<Light,Light,Light>> ltuplist;
 
-void Lightcut::allIntersects(Mesh& mesh, const vector<Light> & lightTable){
+void Lightcut::allIntersects(Mesh& mesh, const vector<Light> & lightTable, int * & result){
   result = new int[mesh.V.size()];
   for (unsigned int i = 0; i < mesh.V.size (); i++){
     result[i]=0;

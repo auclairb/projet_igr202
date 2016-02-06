@@ -6,6 +6,8 @@
 // All rights reserved.
 // ----------------------------------------------
 
+#define TINYOBJLOADER_IMPLEMENTATION
+
 #include <iostream>
 #include <vector>
 #include <string>
@@ -19,6 +21,8 @@
 #include "Camera.h"
 #include "Mesh.h"
 #include "Ray.h"
+
+#include "tiny_obj_loader.h"
 
 using namespace std;
 
@@ -34,7 +38,7 @@ static bool fullScreen = false;
 static Camera camera;
 static Mesh mesh;
 //Adding new static variables
-static Vec3f lightPos(5.0f,0.0f,0.0f);
+static Vec3f lightPos(3.0f,0.0f,0.0f);
 static Vec3f kd (0.9f,0.5f,0.1f);
 //static float ks = 1.0f;
 //static float s = 10.0f;
@@ -43,6 +47,57 @@ static float F0 = 0.03f; //Terme de Fresnel [0.02, 0.05] plastique [0.91,0.92] a
 static	int* result;
 static int N = 0;
 
+//tinyobj variables
+static std::string inputfile = "sibenik.obj";
+static std::vector<tinyobj::shape_t> shapes;
+static std::vector<tinyobj::material_t> materials;
+static std::vector<unsigned int> material_ids;
+static std::vector<pairUV> cuv; //UV coordinates of each vertex of each triangle, separated as t1v1, t1v2, t1v3, t2v1, etc
+
+GLuint loadImageCustom(const char * imagepath)
+{
+  // Data read from the header of the BMP file
+  unsigned char header[54]; // Each BMP file begins by a 54-bytes header
+  unsigned int dataPos;     // Position in the file where the actual data begins
+  unsigned int width, height;
+  unsigned int imageSize;   // = width*height*3
+  // Actual RGB data
+  unsigned char * data;
+  
+  FILE * file = fopen(imagepath, "rb");
+  if (!file){printf("Image could not be opened\n"); return 0;}
+  
+  if ( fread(header, 1, 54, file)!=54 ){
+    printf("Not a correct BMP file\n");
+    return false;
+  }
+  if ( header[0]!='B' || header[1]!='M' ){
+    printf("Not a correct BMP file\n");
+    return 0;
+  }
+  dataPos    = (int)(header[0x0A]);
+  imageSize  = (int)(header[0x22]);
+  width      = (int)(header[0x12]);
+  height     = (int)(header[0x16]);
+  
+  if (imageSize==0)    imageSize=width*height*3;
+  if (dataPos==0)      dataPos=54;
+  
+  data = new unsigned char [imageSize];
+  fread(data,1,imageSize,file);
+  fclose(file);
+  
+  GLuint textureID;
+  glGenTextures(1, &textureID);
+  
+  glBindTexture(GL_TEXTURE_2D, textureID);
+  glTexImage2D(GL_TEXTURE_2D, 0,GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+  
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+  
+  return textureID;
+}
 
 void printUsage () {
 	std::cerr << std::endl 
@@ -97,7 +152,26 @@ void init (const char * modelFilename) {
     glLineWidth (2.0); // Set the width of edges in GL_LINE polygon mode
     glClearColor (0.0f, 0.0f, 0.0f, 1.0f); // Background color
     glClearColor (0.0f, 0.0f, 0.0f, 1.0f);
-    mesh.loadOFF(modelFilename);
+    
+    glEnable(GL_COLOR_MATERIAL);
+    glEnable( GL_TEXTURE_2D );
+    
+    //charge l'objet
+    std::string err; 
+    tinyobj::LoadObj(shapes, materials, err, inputfile.c_str());
+    
+    if (!err.empty()) {
+      std::cerr << err << std::endl;
+      exit(1);
+    }
+	
+    mesh.loadOBJMesh (shapes, material_ids, cuv);
+    //charge l'objet
+    
+    //loads texture
+    loadImageCustom("kamen.bmp");
+    //loads texture
+    
     camera.resize (DEFAULT_SCREENWIDTH, DEFAULT_SCREENHEIGHT);   
     allIntersects(mesh);
 }
@@ -108,6 +182,20 @@ void init (const char * modelFilename) {
 void drawScene () {
     glBegin (GL_TRIANGLES);
     for (unsigned int i = 0; i < mesh.T.size (); i++) 
+    {
+        //material configurations
+	int mat_id = material_ids[i];
+	GLfloat amb[4] = {materials[mat_id].ambient[0], materials[mat_id].ambient[1], materials[mat_id].ambient[2], 1.f };
+	GLfloat diff[4] = {materials[mat_id].diffuse[0], materials[mat_id].diffuse[1], materials[mat_id].diffuse[2], 1.f };
+	GLfloat spec[4] = {materials[mat_id].specular[0], materials[mat_id].specular[1], materials[mat_id].specular[2], 1.f };
+	GLfloat emi[4] = {materials[mat_id].emission[0], materials[mat_id].emission[1], materials[mat_id].emission[2], 1.f };
+	GLfloat shin[1] = {materials[mat_id].shininess};
+	glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, amb);
+	glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, diff);
+	glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, spec);
+	glMaterialfv(GL_FRONT_AND_BACK, GL_EMISSION, emi);
+	glMaterialfv(GL_FRONT_AND_BACK, GL_SHININESS, shin);
+	
         for (unsigned int j = 0; j < 3; j++) {
             const Vertex & v = mesh.V[mesh.T[i].v[j]];
             
@@ -119,10 +207,10 @@ void drawScene () {
             w0.normalize();
             Ray ray = Ray(v.p,w0);
             
-            if(result[mesh.T[i].v[j]] ){
-                glColor3f (0.0f, 0.0f, 0.0f);
-            }
-            else {
+            //if(result[mesh.T[i].v[j]] ){
+            //    glColor3f (0.0f, 0.0f, 0.0f);
+            //}
+            //else {
                 Vec3f wi = (lightPos-v.p);
                 wi.normalize();
                 Vec3f wH = w0 + wi;
@@ -160,11 +248,13 @@ void drawScene () {
 		Vec3f fsVec(fs);
 		Vec3f color = max(0.0f,dot(wi,v.n))*(kd/M_PI + fs );
 		glColor3f (color[0], color[1], color[2]);
-            }
-                        
+            //}
+            
+            glTexCoord2d(cuv[3*i + j].first,cuv[3*i + j].second); //Specifies texture coordinates to be used
             glNormal3f (v.n[0], v.n[1], v.n[2]); // Specifies current normal vertex   
             glVertex3f (v.p[0], v.p[1], v.p[2]); // Emit a vertex (one triangle is emitted each time 3 vertices are emitted)
         }
+    }
     glEnd (); 
 }
 

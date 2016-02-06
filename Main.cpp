@@ -49,6 +49,7 @@ static int N = 0;
 
 //tinyobj variables
 static std::string inputfile = "sibenik.obj";
+static std::string texturefile = "kamen.bmp";
 static std::vector<tinyobj::shape_t> shapes;
 static std::vector<tinyobj::material_t> materials;
 static std::vector<unsigned int> material_ids;
@@ -169,7 +170,7 @@ void init (const char * modelFilename) {
     //charge l'objet
     
     //loads texture
-    loadImageCustom("kamen.bmp");
+    loadImageCustom(texturefile.c_str());
     //loads texture
     
     camera.resize (DEFAULT_SCREENWIDTH, DEFAULT_SCREENHEIGHT);   
@@ -207,10 +208,10 @@ void drawScene () {
             w0.normalize();
             Ray ray = Ray(v.p,w0);
             
-            //if(result[mesh.T[i].v[j]] ){
-            //    glColor3f (0.0f, 0.0f, 0.0f);
-            //}
-            //else {
+            if(result[mesh.T[i].v[j]] ){
+                glColor3f (0.0f, 0.0f, 0.0f);
+            }
+            else {
                 Vec3f wi = (lightPos-v.p);
                 wi.normalize();
                 Vec3f wH = w0 + wi;
@@ -248,7 +249,7 @@ void drawScene () {
 		Vec3f fsVec(fs);
 		Vec3f color = max(0.0f,dot(wi,v.n))*(kd/M_PI + fs );
 		glColor3f (color[0], color[1], color[2]);
-            //}
+            }
             
             glTexCoord2d(cuv[3*i + j].first,cuv[3*i + j].second); //Specifies texture coordinates to be used
             glNormal3f (v.n[0], v.n[1], v.n[2]); // Specifies current normal vertex   

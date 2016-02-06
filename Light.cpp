@@ -30,4 +30,17 @@ Vec3f Light::getAngle() const{
   return this->angle;
 }
 
+bool Light::isEqual(Light light) const {
+  if (this->getPos()==light.getPos()){
+    if (this->getIntensity()==light.getIntensity()){
+      if (this->getDir()==light.getDir()){
+	if(this->getAngle()==light.getAngle()){
+	  return true;
+	}
+      }
+    }
+  }
+  return false;
+}
+
 

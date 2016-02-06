@@ -22,5 +22,6 @@ class Light{
   void setIntensity(float);
   Vec3f getDir()const;
   Vec3f getAngle()const;
+  bool isEqual(Light) const;
 };
 #endif

@@ -3,7 +3,7 @@ SRCS =  Camera.cpp Light.cpp LightTree.cpp Main.cpp Mesh.cpp Ray.cpp
 LIBS =  -lglut -lGLU -lGL -lm 
 CC = g++
 CPP = g++
-FLAGS = -Wall -Werror -O2 -std=gnu++11
+FLAGS = -Wall -O2 -std=gnu++11
 CFLAGS = $(FLAGS)
 CXXFLAGS = $(FLAGS)
 OBJS = $(SRCS:.cpp=.o)

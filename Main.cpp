@@ -75,10 +75,10 @@ GLuint loadImageCustom(const char * imagepath)
     printf("Not a correct BMP file\n");
     return 0;
   }
-  dataPos    = (int)(header[0x0A]);
-  imageSize  = (int)(header[0x22]);
-  width      = (int)(header[0x12]);
-  height     = (int)(header[0x16]);
+  dataPos    = *(int*)&(header[0x0A]);
+  imageSize  = *(int*)&(header[0x22]);
+  width      = *(int*)&(header[0x12]);
+  height     = *(int*)&(header[0x16]);
   
   if (imageSize==0)    imageSize=width*height*3;
   if (dataPos==0)      dataPos=54;

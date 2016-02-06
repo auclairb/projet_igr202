@@ -45,5 +45,22 @@ void Lightcut::allIntersects(Mesh& mesh, const vector<Light> & lightTable, int *
 
 
 void Lightcut::buildLightcut(ltuplist & clusterTable, Mesh& mesh, const vector<Light> & lightTable, float error){
-  this->allIntersects(mesh, lightTable, result);
+  /*this->allIntersects(mesh, lightTable, result);
+  vector<Light> cut;
+  cut.push_back(get<0>(clusterTable.back()));
+  float errorTest=0;
+  erroTest = ;
+
+
+  while (errorTest>error){
+    errorTest=0;
+    for(vector<Light>::iterator it = cut.begin()){
+      
+    }
+    this->allIntersects(mesh, cut, test);
+    for(int i =0;i<result.size();i++){
+      //always positive
+      errorTest += result[i]-test[i];
+    }
+    }*/
 }

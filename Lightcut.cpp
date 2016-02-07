@@ -46,6 +46,8 @@ void Lightcut::allIntersects(Mesh& mesh, const vector<Light> & lightTable, int *
 void Lightcut::buildLightcut(ltuplist & clusterTable, Mesh& mesh, const vector<Light> & lightTable, float error){
   this->allIntersects(mesh, lightTable, result);
   int * radiance = new int[mesh.V.size()];
+  float errorBound = 0;
+
   for(unsigned int k = 0; k<mesh.V.size();k++){
     radiance[k]=0;
     const Vertex & v = mesh.V[k];
@@ -56,5 +58,23 @@ void Lightcut::buildLightcut(ltuplist & clusterTable, Mesh& mesh, const vector<L
       int intensity = light.getIntensity();
       radiance[k]+=geometry*intensity;
     }
+  }
+
+  vector<Light> cut;
+  cut.push_back(get<0>(clusterTable.back()));
+
+  for(unsigned int k = 0; k<mesh.V.size();k++){
+    const Vertex & v = mesh.V[k];
+    Light light = cut.back();
+    Vec3f wi = (light.getPos()-v.p);
+    int geometry = 1 / (wi.length())*(wi.length());
+    int intensity = light.getIntensity();
+    if(radiance[k]!=0){
+      errorBound+=(radiance[k]-geometry*intensity)/radiance[k];
+    }
+  }
+  
+  while(errorBound>error){
+    
   }
 }

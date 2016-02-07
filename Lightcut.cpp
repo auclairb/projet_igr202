@@ -3,29 +3,28 @@
 #include "Vec3.h"
 
 using namespace std;
-extern int * result;
+extern int * * result;
 extern int * test;
 //static int N; used for AO
 typedef list<tuple<Light,Light,Light>> ltuplist;
 
-void Lightcut::allIntersects(Mesh& mesh, const vector<Light> & lightTable, int * & result){
-  result = new int[mesh.V.size()];
+void Lightcut::allIntersects(Mesh& mesh, const vector<Light> & lightTable, int ** & result){
+  result = new int*[mesh.V.size()];
   for (unsigned int i = 0; i < mesh.V.size (); i++){
-    result[i]=0;
+    int index = 0;
+    result[i]=new int[lightTable.size()];;
     cout << i << endl;        
     const Vertex & v = mesh.V[i];
-    for(vector<Light>::const_iterator it = lightTable.begin(); it!=lightTable.end();it++){
+    for(vector<Light>::const_iterator it = lightTable.begin(); it!=lightTable.end();it++,index++){
       Vec3f wi = (it->getPos()-v.p);
-      float d = wi.length();
       wi.normalize();
       Ray ray = Ray(v.p,wi);
 
       if(ray.intersects(mesh)){
-	//because we don't know what are the coefficients we put 0,01
-	result[i] += it->getIntensity()/(0.01+0.01*d+0.01*d*d);
+	(result[i])[index] = 1;
       }
       else {
-	result[i] = 0;
+	(result[i])[index] = 0;
 	//What is following was for AO
 	/*Vec3f result(0.0f,0.0f,0.0f) ;
 	  result = cartesianToPolar(v.n);

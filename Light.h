@@ -12,6 +12,7 @@ class Light{
   float intensity;
   Vec3f dir;
   Vec3f angle;
+  float index;
 
  public:
   Light(){};
@@ -22,5 +23,7 @@ class Light{
   void setIntensity(float);
   Vec3f getDir()const;
   Vec3f getAngle()const;
+  float getIndex()const;
+  bool isEqual(Light) const;
 };
 #endif

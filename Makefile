@@ -1,5 +1,5 @@
 EXE = main
-SRCS =  Camera.cpp Light.cpp LightTree.cpp Main.cpp Mesh.cpp Ray.cpp 
+SRCS =  Camera.cpp Light.cpp LightTree.cpp Main.cpp Mesh.cpp Ray.cpp Lightcut.cpp
 LIBS =  -lglut -lGLU -lGL -lm 
 CC = g++
 CPP = g++

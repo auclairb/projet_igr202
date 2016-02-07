@@ -29,6 +29,9 @@ Vec3f Light::getDir() const{
 Vec3f Light::getAngle() const{
   return this->angle;
 }
+float Light::getIndex() const{
+  return this->index;
+}
 
 bool Light::isEqual(Light light) const {
   if (this->getPos()==light.getPos()){

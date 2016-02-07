@@ -45,8 +45,9 @@ void Lightcut::allIntersects(Mesh& mesh, const vector<Light> & lightTable, int *
 
 void Lightcut::buildLightcut(ltuplist & clusterTable, Mesh& mesh, const vector<Light> & lightTable, float error){
   this->allIntersects(mesh, lightTable, result);
+  ltuplist clusterTableCopy = clusterTable;
   int * radiance = new int[mesh.V.size()];
-  float errorBound = 0;
+  float errorTest = 0;
 
   for(unsigned int k = 0; k<mesh.V.size();k++){
     radiance[k]=0;
@@ -54,9 +55,10 @@ void Lightcut::buildLightcut(ltuplist & clusterTable, Mesh& mesh, const vector<L
     for(unsigned int j = 0; j<lightTable.size();j++){
       Light light = lightTable.at(j);
       Vec3f wi = (light.getPos()-v.p);
-      int geometry = 1 / (wi.length())*(wi.length());
-      int intensity = light.getIntensity();
-      radiance[k]+=geometry*intensity;
+      float geometry = 1 / (wi.length())*(wi.length());
+      float intensity = light.getIntensity();
+      float visibility = (result[k])[j];
+      radiance[k]+=geometry*intensity*visibility;
     }
   }
 
@@ -70,11 +72,35 @@ void Lightcut::buildLightcut(ltuplist & clusterTable, Mesh& mesh, const vector<L
     int geometry = 1 / (wi.length())*(wi.length());
     int intensity = light.getIntensity();
     if(radiance[k]!=0){
-      errorBound+=(radiance[k]-geometry*intensity)/radiance[k];
+      errorTest+=(radiance[k]-geometry*intensity)/radiance[k];
     }
   }
   
-  while(errorBound>error){
+  while(errorTest>error){
+    errorTest=0;
+    //float errorBound = INFINITY;
+    //float errorRec;
+    Light son1;
+    Light son2;
     
+    for(vector<Light>::iterator it = cut.begin();it!=cut.end();it++){
+      //errorRec=0;
+      /*for(ltuplist::iterator jt = clusterTable.begin(); jt!=clusterTable.end();jt++){
+	if((get<0>(jt)).isEqual(it)){
+
+	  for(unsigned int k = 0; k<mesh.V.size();k++){
+	    const Vertex & v = mesh.V[k];
+	    Light light = cut.back();
+	    Vec3f wi = (light.getPos()-v.p);
+	    int geometry = 1 / (wi.length())*(wi.length());
+	    int intensity = light.getIntensity();
+	    if(radiance[k]!=0){
+	      errorTest+=(radiance[k]-geometry*intensity)/radiance[k];
+	    }
+
+	  }
+	}
+	}*/
+    }
   }
 }

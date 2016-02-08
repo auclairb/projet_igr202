@@ -46,8 +46,19 @@ ltuplist LightTree::createLightTree(const vector<Light> & lightTable){
     cout << "lightTwo : " <<(lightTable1.at(lightTwo)).getIndex() << endl;
     
     cout << "le cluster a le numero :"<<cluster.getIndex() <<endl;
-    lightTable1.erase(lightTable1.begin()+lightOne);
-    lightTable1.erase(lightTable1.begin()+lightTwo);
+    for(vector<Light>::iterator it = lightTable1.begin(); it != lightTable1.end(); it ++){
+      if((*it).getIndex()==lightOne){
+	lightTable1.erase(it);
+	// it-- in order to cancel the effect of erase auto increment
+	it--;
+      }
+      if((*it).getIndex()==lightTwo){
+	//cout << "lightTwo erasing : " <<(lightTable1.at(lightTwo)).getIndex() << endl;
+	lightTable1.erase(it);
+	cout << "lightTwo erased" << endl;
+	it--;
+      }
+    }
     lightTable1.push_back(cluster);
     distTable = createNeighboursTable(lightTable1);
     }
@@ -94,7 +105,7 @@ ftuplist LightTree::createNeighboursTable(const vector<Light> & lightTable){
     }
     //Store (distanceValue, index1, index2) as closest neighbours
     if(closestNeighbour != index){
-    distTable.push_back(make_tuple(min,index,closestNeighbour));
+      distTable.push_back(make_tuple(min,index,closestNeighbour));
     }
   }
   distTable.sort([](const ftup & a, const ftup & b) { return get<0>(a) < get<0>(b); });

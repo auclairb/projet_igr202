@@ -42,10 +42,10 @@ static bool fullScreen = false;
 static Camera camera;
 static Mesh mesh;
 //Adding new static variables
-static Vec3f lightV0(3.0f,0.0f,0.0f);
-static Vec3f lightV1(10.0f,10.0f,10.0f);
-static Vec3f lightV2(-10.0f,10.0f,-10.0f);
-static Vec3f lightV3(10.0f,-10.0f,10.0f);
+static Vec3f lightV0(-10.0f,0.0f,0.0f);
+static Vec3f lightV1(-5.0f,0.0f,0.0f);
+static Vec3f lightV2(7.0f,0.0f,0.0f);
+static Vec3f lightV3(9.0f,0.0f,0.0f);
 static Vec3f nul(0.0f,0.0f,0.0f);
 
 static Light light0 (lightV0, 20.0f, nul, nul, 0);

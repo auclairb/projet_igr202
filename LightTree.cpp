@@ -35,14 +35,19 @@ ltuplist LightTree::createLightTree(const vector<Light> & lightTable){
   vector<Light> lightTable1 = lightTable;
   //get Neighbours table
   ftuplist distTable = createNeighboursTable(lightTable1);
-  ltuplist clusterTable;
+  ltuplist clusterTable={};
   
   while (!distTable.empty()){
     Light cluster = createCluster(distTable, clusterTable,lightTable1);
-    vector<Light>::iterator lightOne = lightTable1.begin() + get<1>(distTable.front());
-    vector<Light>::iterator lightTwo = lightTable1.begin() + get<2>(distTable.front());
-    lightTable1.erase(lightOne);
-    lightTable1.erase(lightTwo);
+    int lightOne = get<1>(distTable.front());
+    int lightTwo = get<2>(distTable.front());
+    
+    cout << "lightOne : " <<(lightTable1.at(lightOne)).getIndex() << endl;
+    cout << "lightTwo : " <<(lightTable1.at(lightTwo)).getIndex() << endl;
+    
+    cout << "le cluster a le numero :"<<cluster.getIndex() <<endl;
+    lightTable1.erase(lightTable1.begin()+lightOne);
+    lightTable1.erase(lightTable1.begin()+lightTwo);
     lightTable1.push_back(cluster);
     distTable = createNeighboursTable(lightTable1);
     }
@@ -63,36 +68,38 @@ ltuplist LightTree::createLightTree(const vector<Light> & lightTable){
 
 ///Function that builds the closest neighbours list<tuple<float,float,float>> table
 ftuplist LightTree::createNeighboursTable(const vector<Light> & lightTable){
+  static int compteur =0;
+  compteur ++;
+  cout <<"oh c'est ma " << compteur << " fois !!" <<endl;
   //Output table
-  ftuplist distTable;
-  int index = 0;
+  ftuplist distTable = {};
   //Search the whole table
-  for(vector<Light>::const_iterator it = lightTable.begin(); it != lightTable.end()-1; it ++, index ++){
+  for(vector<Light>::const_iterator it = lightTable.begin(); it != lightTable.end(); it ++){
     float min = INFINITY;
+    int index = it->getIndex();
     int closestNeighbour = index;
     float distance = 0.0f;
-    int index2 = 0;
     //Compare each Light to all other Lights
-    for(vector<Light>::const_iterator jt = lightTable.begin(); jt != lightTable.end(); jt ++, index2++){
-      //If itself, ignore
-      if(dist(it->getPos(), jt->getPos())==0){
-	continue;
-      }
+    for(vector<Light>::const_iterator jt = lightTable.begin(); jt != lightTable.end();jt++){
+
       //Compute distance
       distance = dist(it->getPos(), jt->getPos());
+      
       //Store it as closest neighbour if conditions are met
       if(distance < min && distance >0)
 	{
 	  min = distance;
-	  closestNeighbour = index2;
+	  closestNeighbour = jt->getIndex();
 	}
-      }
+    }
     //Store (distanceValue, index1, index2) as closest neighbours
+    if(closestNeighbour != index){
     distTable.push_back(make_tuple(min,index,closestNeighbour));
+    }
   }
   distTable.sort([](const ftup & a, const ftup & b) { return get<0>(a) < get<0>(b); });
   for(ftuplist::iterator it = distTable.begin(); it != distTable.end(); it++){
-    cout << "***dist min      " << (get<0>(*it)) << " ***"<<endl;
+    cout << "***dist min      " << (get<0>(*it)) << endl;
     cout << "neighbour 1     :" << (get<1>(*it)) << endl;
     cout << "neighbour 2     :" << (get<2>(*it)) << endl;
 

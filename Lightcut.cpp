@@ -12,8 +12,7 @@ void Lightcut::allIntersects(Mesh& mesh, const vector<Light> & lightTable, int *
   result = new int*[mesh.V.size()];
   for (unsigned int i = 0; i < mesh.V.size (); i++){
     int index = 0;
-    result[i]=new int[lightTable.size()];;
-    cout << i << endl;        
+    result[i]=new int[lightTable.size()];        
     const Vertex & v = mesh.V[i];
     for(vector<Light>::const_iterator it = lightTable.begin(); it!=lightTable.end();it++,index++){
       Vec3f wi = (it->getPos()-v.p);
@@ -40,15 +39,17 @@ void Lightcut::allIntersects(Mesh& mesh, const vector<Light> & lightTable, int *
       }
     }
   }
+  cout << "ENDING ALL INTERSECTS" << endl;
 }
 
 
 void Lightcut::buildLightcut(ltuplist & clusterTable, Mesh& mesh, const vector<Light> & lightTable, float error){
   this->allIntersects(mesh, lightTable, result);
-  ltuplist clusterTableCopy = clusterTable;
+  cout << "EEEEUh"<<endl;
   int * radiance = new int[mesh.V.size()];
   float errorTest = 0.0f;
 
+  cout << "BUCKLE UP 1" << endl;
   for(unsigned int k = 0; k<mesh.V.size();k++){
     radiance[k]=0;
     const Vertex & v = mesh.V[k];
@@ -62,9 +63,11 @@ void Lightcut::buildLightcut(ltuplist & clusterTable, Mesh& mesh, const vector<L
     }
   }
 
+  cout <<"PUSH BACK §§"<<endl;
   vector<Light> cut;
   cut.push_back(get<0>(clusterTable.back()));
 
+  cout <<"BUCKLE UP TOO"<<endl;
   for(unsigned int k = 0; k<mesh.V.size();k++){
     const Vertex & v = mesh.V[k];
     Light light = cut.back();
@@ -76,19 +79,23 @@ void Lightcut::buildLightcut(ltuplist & clusterTable, Mesh& mesh, const vector<L
       errorTest += abs(radiance[k]-geometry*intensity*visibility)/radiance[k];
     }
   }
-  
+  cout <<"HE HAS GONE WHIIILED"<<endl;
   while(errorTest>error && cut.size()!= lightTable.size()){
     float errorBound = INFINITY;
     float errorRec = 0.0f;
     Light root;
     Light son1;
     Light son2;
-    
+    cout <<"ONE LOOP"<<endl; 
     for(vector<Light>::iterator it = cut.begin();it!=cut.end();it++){
-      //errorRec=0;
+      errorRec=0;
+      cout <<"TWO LOOPS"<<endl;
+      	cout << clusterTable.size()<<endl;
       for(ltuplist::iterator jt = clusterTable.begin(); jt!=clusterTable.end();jt++){
+
 	Light R, S1, S2;
 	if((get<0>(*jt)).isEqual(*it)){
+	  cout <<"IN IF"<<endl;
 	  for(unsigned int k = 0; k<mesh.V.size();k++){
 	    const Vertex & v = mesh.V[k];
 	    R = *it;
@@ -127,6 +134,7 @@ void Lightcut::buildLightcut(ltuplist & clusterTable, Mesh& mesh, const vector<L
 	    errorBound = errorRec;
 	  }
 	}
+	cout<<"AFTER IF Poilane in end of big FOR"<<endl;
       }
     }
 
@@ -135,8 +143,27 @@ void Lightcut::buildLightcut(ltuplist & clusterTable, Mesh& mesh, const vector<L
 	cut.erase(it);
       }
     }
+    cout<<"AFTER LAST FOR"<<endl;
     cut.push_back(son1);
     cut.push_back(son2);
     errorTest -=errorBound;
+    cout<<"END OF TOUR. DO NOT GET 200€"<<endl;
+  }
+  cout << "ENDING LIGHT CUTTING" << endl<<endl;
+    for(vector<Light>::const_iterator it = lightTable.begin(); it != lightTable.end(); it++){
+    cout << "*** Light Table n°" << (*it).getIndex() << " ***"<<endl;
+    cout << "Posé      : " << (*it).getPos() << endl; 
+    cout << "Intensity : " << (*it).getIntensity() << endl;
+    cout << "Dir       : " << (*it).getDir() << endl;
+    cout << "Angle     : " << (*it).getAngle() << endl;
+  }
+    cout <<endl;
+    
+  for(vector<Light>::iterator it = cut.begin(); it != cut.end(); it++){
+    cout << "*** Light " << (*it).getIndex() << " ***"<<endl;
+    cout << "Posé      : " << (*it).getPos() << endl; 
+    cout << "Intensity : " << (*it).getIntensity() << endl;
+    cout << "Dir       : " << (*it).getDir() << endl;
+    cout << "Angle     : " << (*it).getAngle() << endl;
   }
 }

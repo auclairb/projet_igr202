@@ -35,10 +35,12 @@ int Light::getIndex() const{
 }
 
 bool Light::isEqual(Light light) const {
-  if (this->getPos()==light.getPos()){
-    if (this->getDir()==light.getDir()){
-      if(this->getAngle()==light.getAngle()){
-	return true;
+  if(this->getIndex()==light.getIndex()){
+    if (this->getPos()==light.getPos()){
+      if (this->getDir()==light.getDir()){
+	if(this->getAngle()==light.getAngle()){
+	  return true;
+	}
       }
     }
   }

@@ -32,7 +32,7 @@ using namespace std;
 static const unsigned int DEFAULT_SCREENWIDTH = 1024;
 static const unsigned int DEFAULT_SCREENHEIGHT = 768;
 static const string DEFAULT_MESH_TYPE ("off");
-static const string DEFAULT_MESH_FILE ("models/man.off");
+static const string DEFAULT_MESH_FILE ("models/monkey.off");
 
 static string appTitle ("Informatique Graphique & Realite Virtuelle - Travaux Pratiques - Algorithmes de Rendu");
 static GLint window;
@@ -48,10 +48,10 @@ static Vec3f lightV2(-10.0f,10.0f,-10.0f);
 static Vec3f lightV3(10.0f,-10.0f,10.0f);
 static Vec3f nul(0.0f,0.0f,0.0f);
 
-static Light light0(lightV0,20.0f,nul,nul,0);
-static Light light1(lightV1,1.0f,nul,nul,1);
-static Light light2(lightV2,10.0f,nul,nul,2);
-static Light light3(lightV3,12.0f,nul,nul,3);
+static Light light0 (lightV0, 20.0f, nul, nul, 0);
+static Light light1(lightV1, 1.0f, nul, nul, 1);
+static Light light2(lightV2, 10.0f, nul, nul, 2);
+static Light light3(lightV3, 12.0f, nul, nul, 3);
 
 static const vector<Light> lightTable{light0,light1,light2,light3};
 
@@ -61,6 +61,7 @@ static Vec3f kd (0.9f,0.5f,0.1f);
 static float alpha = 0.1f;  //rugosité 0 =< alpha =< 1
 static float F0 = 0.03f; //Terme de Fresnel [0.02, 0.05] plastique [0.91,0.92] alu
 int** result;
+ltuplist * clusterTable = new ltuplist();
 static LightTree * lightTree = new LightTree();
 static Lightcut * lightcut = new Lightcut();
 static float cutsError = 0.05f;
@@ -122,7 +123,7 @@ void printUsage () {
 	std::cerr << std::endl 
 		 << appTitle << std::endl
          << "Author: Tamy Boubekeur" << std::endl << std::endl
-         << "Usage: ./main [<file.off>]" << std::endl
+		  << "Usage: ./main [<file type = obj or off] [<file.obj> or <file.off>]" << std::endl
          << "Commands:" << std::endl 
          << "------------------" << std::endl
          << " ?: Print help" << std::endl
@@ -174,10 +175,12 @@ void init (const char * fileType, const char * modelFilename) {
       cerr << "NO TYPE DETECTED !!!" <<endl;
     }
     camera.resize (DEFAULT_SCREENWIDTH, DEFAULT_SCREENHEIGHT);   
-
+    cout << "IN INIT"<<endl;
     //Build light Tree/cluster table
-    ltuplist clusterTable = lightTree->createLightTree(lightTable);
-    lightcut->buildLightcut(clusterTable,mesh,lightTable,cutsError);
+    *clusterTable = lightTree->createLightTree(lightTable);
+    cout << "i know i m right"<<endl;
+    lightcut->buildLightcut(*clusterTable,mesh,lightTable,cutsError);
+    cout <<"END INIT"<<endl;
 }
  
 

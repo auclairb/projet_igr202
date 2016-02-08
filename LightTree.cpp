@@ -30,7 +30,8 @@ vector<Light> LightTree::listToVec(const list<Light> & liste){
 
 
 ///Function that builds a light Tree
-ltuplist LightTree::createLightTree(const vector<Light> & lightTable){ 
+ltuplist LightTree::createLightTree(const vector<Light> & lightTable){
+  cout << "Entering with caution"<<endl;
   vector<Light> lightTable1 = lightTable;
   //get Neighbours table
   ftuplist distTable = createNeighboursTable(lightTable1);
@@ -45,6 +46,19 @@ ltuplist LightTree::createLightTree(const vector<Light> & lightTable){
     lightTable1.push_back(cluster);
     distTable = createNeighboursTable(lightTable1);
     }
+    cout << "Cluster table"<<endl;
+    for(ltuplist::iterator it = clusterTable.begin(); it != clusterTable.end(); it++){
+      cout << "*** Cluster n°" << (get<0>(*it)).getIndex() << " ***"<<endl;
+      cout << "son 1     :" << (get<1>(*it)).getIndex() << endl;
+      cout << "son 2     :" << (get<2>(*it)).getIndex() << endl;
+      cout << "Posé      : " << (get<0>(*it)).getPos() << endl; 
+      cout << "Intensity : " << (get<0>(*it)).getIntensity() << endl;
+      cout << "Dir       : " << (get<0>(*it)).getDir() << endl;
+      cout << "Angle     : " << (get<0>(*it)).getAngle() << endl;
+     
+    }
+    cout <<endl;
+  return clusterTable;
 }
 
 ///Function that builds the closest neighbours list<tuple<float,float,float>> table
@@ -75,9 +89,15 @@ ftuplist LightTree::createNeighboursTable(const vector<Light> & lightTable){
       }
     //Store (distanceValue, index1, index2) as closest neighbours
     distTable.push_back(make_tuple(min,index,closestNeighbour));
-    }
-
+  }
   distTable.sort([](const ftup & a, const ftup & b) { return get<0>(a) < get<0>(b); });
+  for(ftuplist::iterator it = distTable.begin(); it != distTable.end(); it++){
+    cout << "***dist min      " << (get<0>(*it)) << " ***"<<endl;
+    cout << "neighbour 1     :" << (get<1>(*it)) << endl;
+    cout << "neighbour 2     :" << (get<2>(*it)) << endl;
+
+     
+  }
   return distTable;
 }
 

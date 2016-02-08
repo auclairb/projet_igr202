@@ -31,42 +31,30 @@ vector<Light> LightTree::listToVec(const list<Light> & liste){
 
 ///Function that builds a light Tree
 ltuplist LightTree::createLightTree(const vector<Light> & lightTable){
-  cout << "Entering with caution"<<endl;
   vector<Light> lightTable1 = lightTable;
   //get Neighbours table
   ftuplist distTable = createNeighboursTable(lightTable1);
   ltuplist clusterTable={};
   
   while (!distTable.empty()){
-    cout << "ENTER WHILE" << endl;
     Light cluster = createCluster(distTable, clusterTable,lightTable1);
-    cout << "Bah ou est l'erreur"<<endl;
     int lightOne = get<1>(distTable.front());
-    cout << " EUH?"<<endl;
-    
     int lightTwo = get<2>(distTable.front());
-    cout << "???"<<endl;
     
     cout << "le cluster a le numero :"<<cluster.getIndex() <<endl;
     for(vector<Light>::iterator it = lightTable1.begin(); it != lightTable1.end(); it ++){
       if((*it).getIndex()==lightOne){
-	cout << "LIgt ONE ERASING" << endl;
 	lightTable1.erase(it);
-	cout << "LIGHT ONE ERASED" << endl;
 	// it-- in order to cancel the effect of erase auto increment
 	it--;
       }
       if((*it).getIndex()==lightTwo){
-	cout << "lightTwo erasing : "  << endl;
 	lightTable1.erase(it);
-	cout << "lightTwo erased" << endl;
 	it--;
       }
     }
     lightTable1.push_back(cluster);
-    cout << "Waiting for NE TABLE" << endl;
     distTable = createNeighboursTable(lightTable1);
-    cout << " NE TABLE gotten" << endl;
     }
     cout << "Cluster table"<<endl;
     for(ltuplist::iterator it = clusterTable.begin(); it != clusterTable.end(); it++){
@@ -134,7 +122,6 @@ Light LightTree::createCluster(ftuplist disTable, ltuplist & clusterTable, vecto
       lightTwo = *it;
     }
   }
-  cout << "Avec brio"<<endl;
   Light cluster;
 
   float intensityOne = lightOne.getIntensity();
@@ -154,8 +141,6 @@ Light LightTree::createCluster(ftuplist disTable, ltuplist & clusterTable, vecto
   cluster.setIntensity(intensity);
 
   tuple<Light,Light,Light> clusterOne = make_tuple(cluster,lightOne,lightTwo) ;
-  cout << "Avant bernardo"<<endl;
   clusterTable.push_back(clusterOne);
-  cout << "Après l'avoir poussé" << endl;
   return cluster;
 }

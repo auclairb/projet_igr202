@@ -152,7 +152,7 @@ void init (const char * fileType, const char * modelFilename) {
   glEnable( GL_TEXTURE_2D );
     
   if(strcmp(fileType,"obj")==0){
-    cout << endl << "--- OBJ type ON --- " << endl << endl;
+    cout << endl << "--- OBJ Mesh Type selected --- " << endl << endl;
     //charge l'objet
     std::string err; 
     tinyobj::LoadObj(shapes, materials, err, inputfile.c_str());
@@ -171,7 +171,7 @@ void init (const char * fileType, const char * modelFilename) {
     //loads texture
   }
   else if(strcmp(fileType,"off")==0){
-    cout<< endl << "--- OFF  type ON ---" << endl << endl;
+    cout<< endl << "--- OFF Mesh Type selected ---" << endl << endl;
     mesh.loadOFF(modelFilename);
   }
   else{

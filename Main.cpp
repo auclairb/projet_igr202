@@ -179,7 +179,7 @@ void init (const char * fileType, const char * modelFilename) {
   camera.resize (DEFAULT_SCREENWIDTH, DEFAULT_SCREENHEIGHT);
   //Build light Tree/cluster table
   *clusterTable = lightTree->createLightTree(lightTable);
-  lightcut->buildLightcut(*clusterTable,mesh,lightTable,cutsError,result);
+  lightcut->buildLightcut(*clusterTable,mesh,lightTable,cutsError,result,1);
 }
  
 

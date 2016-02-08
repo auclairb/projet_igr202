@@ -3,7 +3,7 @@
 #include "Vec3.h"
 
 using namespace std;
-//extern int * * result;
+//extern int ** result;
 extern int * test;
 //static int N; used for AO
 typedef list<tuple<Light,Light,Light>> ltuplist;
@@ -42,56 +42,39 @@ void Lightcut::allIntersects(Mesh& mesh, const vector<Light> & lightTable, int *
 }
 
 
-void Lightcut::buildLightcut(ltuplist & clusterTable, Mesh& mesh, const vector<Light> & lightTable, float error, int ** & result){
-  this->allIntersects(mesh, lightTable, result);
+int* Lightcut::buildLightcut(ltuplist & clusterTable, Mesh& mesh, const vector<Light> & lightTable, float error, int ** & result, int vertex){
+  
   static int lightCutCount = 1;
   cout << "Entering buildLightcut : " << lightCutCount << "th time" << endl;
   lightCutCount++;
-  int * radiance = new int[mesh.V.size()];
-  int * radianceTest = new int[mesh.V.size()];
+  int radiance=0;
+  int radianceTest=0;
   float errorTest = 0.0f;
 
-  for(unsigned int k = 0; k<mesh.V.size();k++){
-    radiance[k]=0;
-    const Vertex & v = mesh.V[k];
-    for(unsigned int j = 0; j<lightTable.size();j++){
-      Light light = lightTable.at(j);
-      Vec3f wi = (light.getPos()-v.p);
-      float geometry = 1 / (wi.length())*(wi.length());
-      float intensity = light.getIntensity();
-      float visibility = (result[k])[j];
-      radiance[k]+=geometry*intensity*visibility;
-    }
-    /******CORRECTIF
-	   ne pas fermer le crochet et utiliser la suite. On va faire tourner sur tous les pixels.
-     */
+  const Vertex & v = mesh.V[vertex];
+  for(unsigned int j = 0; j<lightTable.size();j++){
+    Light light = lightTable.at(j);
+    Vec3f wi = (light.getPos()-v.p);
+    float geometry = 1 / (wi.length())*(wi.length());
+    float intensity = light.getIntensity();
+    float visibility = (result[vertex])[j];
+    radiance+=geometry*intensity*visibility;
   }
 
   vector<Light> cut;
   cut.push_back(get<0>(clusterTable.back()));
-  /*******Inutile de refaire la boucle de toute facon haha**/
-  for(unsigned int k = 0; k<mesh.V.size();k++){
-    radianceTest[k]=0;
-    const Vertex & v = mesh.V[k];
-    /***********REPRENDRE ICI********/
-    Light light = cut.back();
-    Vec3f wi = (light.getPos()-v.p);
-    float geometry = 1 / (wi.length())*(wi.length());
-    float intensity = light.getIntensity();
-    float visibility = (result[k])[(cut.at(0)).getIndex()];
-    radianceTest[k]+=geometry*intensity*visibility;
-    if(radiance[k]!=0){
-      errorTest+=abs(radiance[k]-radianceTest[k])/radiance[k];
-    }
+
+  Light light = cut.back();
+  Vec3f wi = (light.getPos()-v.p);
+  float geometry = 1 / (wi.length())*(wi.length());
+  float intensity = light.getIntensity();
+  float visibility = (result[vertex])[(cut.at(0)).getIndex()];
+  radianceTest+=geometry*intensity*visibility;
+  if(radiance!=0){
+    errorTest+=abs(radiance-radianceTest)/radiance;
   }
-  cout << "errorTest = " << errorTest << endl;
-  cout << "Contenu de cut:" << (cut.front()).getIndex()<<endl;
   
   while(errorTest>error && cut.size()!= lightTable.size()){
-    cout <<"Contenu de cut :"<<endl;
-    for(unsigned int k =0;k<cut.size();k++){
-      cout << (cut.at(k)).getIndex()<<endl;
-    }
     
     float errorBound = INFINITY;
     float errorRec = 0.0f;
@@ -100,50 +83,45 @@ void Lightcut::buildLightcut(ltuplist & clusterTable, Mesh& mesh, const vector<L
     Light son2;
     for(vector<Light>::iterator it = cut.begin();it!=cut.end();it++){
       errorRec=0;
-      cout <<"taille de la clusterTable :"<< clusterTable.size()<<endl;
+      
       for(ltuplist::iterator jt = clusterTable.begin(); jt!=clusterTable.end();jt++){
 	
 	Light R, S1, S2;
 	if((get<0>(*jt)).isEqual(*it) && (*it).getIntensity() == (get<1>(*jt)).getIntensity() +(get<2>(*jt)).getIntensity() ){
-	  for(unsigned int k = 0; k<mesh.V.size();k++){
-	    const Vertex & v = mesh.V[k];
-	    R = *it;
-	    S1 = get<1>(*jt);
-	    S2 = get<2>(*jt);
+	  R = *it;
+	  S1 = get<1>(*jt);
+	  S2 = get<2>(*jt);
 
-	    Vec3f wiR = (R.getPos()-v.p);
-	    Vec3f wiS1 = (S1.getPos()-v.p);
-	    Vec3f wiS2 = (S1.getPos()-v.p);
+	  Vec3f wiR = (R.getPos()-v.p);
+	  Vec3f wiS1 = (S1.getPos()-v.p);
+	  Vec3f wiS2 = (S1.getPos()-v.p);
 
-	    float geometryR = 1 / (wiR.length())*(wiR.length());
-	    float intensityR = R.getIntensity();
-	    float visibilityR = (result[k])[R.getIndex()];
+	  float geometryR = 1 / (wiR.length())*(wiR.length());
+	  float intensityR = R.getIntensity();
+	  float visibilityR = (result[vertex])[R.getIndex()];
 
-	    float geometryS1 = 1 / (wiS1.length())*(wiS1.length());
-	    float intensityS1 = S1.getIntensity();
-	    float visibilityS1 = (result[k])[S1.getIndex()];
+	  float geometryS1 = 1 / (wiS1.length())*(wiS1.length());
+	  float intensityS1 = S1.getIntensity();
+	  float visibilityS1 = (result[vertex])[S1.getIndex()];
 
-	    float geometryS2 = 1 / (wiS2.length())*(wiS2.length());
-	    float intensityS2 = S2.getIntensity();
-	    float visibilityS2 = (result[k])[S2.getIndex()];
+	  float geometryS2 = 1 / (wiS2.length())*(wiS2.length());
+	  float intensityS2 = S2.getIntensity();
+	  float visibilityS2 = (result[vertex])[S2.getIndex()];
 
-	    if(visibilityS2 == 0 && visibilityS1 != 0){
-	      errorRec+=abs(geometryS1*intensityS1*visibilityS1-geometryR*intensityR*visibilityR)/(geometryS1*intensityS1*visibilityS1);
-	    } else if (visibilityS1 == 0 && visibilityS2 != 0){
-	      errorRec+=abs(geometryS2*intensityS2*visibilityS2-geometryR*intensityR*visibilityR)/(geometryS2*intensityS2*visibilityS2);
-	    } else if (visibilityS1 != 0 && visibilityS2 != 0) {
-	      errorRec+=abs(geometryS1*intensityS1*visibilityS1-geometryR*intensityR*visibilityR)/(geometryS1*intensityS1*visibilityS1) + abs(geometryS2*intensityS2*visibilityS2-geometryR*intensityR*visibilityR)/(geometryS2*intensityS2*visibilityS2);
-	    }
+	  if(visibilityS2 == 0 && visibilityS1 != 0){
+	    errorRec+=abs(geometryS1*intensityS1*visibilityS1-geometryR*intensityR*visibilityR)/(geometryS1*intensityS1*visibilityS1);
+	  } else if (visibilityS1 == 0 && visibilityS2 != 0){
+	    errorRec+=abs(geometryS2*intensityS2*visibilityS2-geometryR*intensityR*visibilityR)/(geometryS2*intensityS2*visibilityS2);
+	  } else if (visibilityS1 != 0 && visibilityS2 != 0) {
+	    errorRec+=abs(geometryS1*intensityS1*visibilityS1-geometryR*intensityR*visibilityR)/(geometryS1*intensityS1*visibilityS1) + abs(geometryS2*intensityS2*visibilityS2-geometryR*intensityR*visibilityR)/(geometryS2*intensityS2*visibilityS2);
 	  }
-	  cout <<"erreur entre fils et racine :"<<errorRec<<endl;
+	}
 
-	  if (errorRec<errorBound){
-	    root = R;
-	    son1 = S1;
-	    son2= S2;
-	    errorBound = errorRec;
-	  }
-	  cout << "valeur errorBound :"<<errorBound<<endl;
+	if (errorRec<errorBound){
+	  root = R;
+	  son1 = S1;
+	  son2= S2;
+	  errorBound = errorRec;
 	}
       }
     }
@@ -157,36 +135,30 @@ void Lightcut::buildLightcut(ltuplist & clusterTable, Mesh& mesh, const vector<L
     cut.push_back(son2);
     errorTest=0;
     
-    for(unsigned int k = 0; k<mesh.V.size();k++){
-      const Vertex & v = mesh.V[k];
-      radianceTest[k]=0;
-      for(vector<Light>::iterator it = cut.begin();it !=cut.end();it++){
-	Light light = *it;
-	Vec3f wi = (light.getPos()-v.p);
-	float geometry = 1 / (wi.length())*(wi.length());
-	float intensity = light.getIntensity();
-	float visibility = (result[k])[light.getIndex()];
-	radianceTest[k] += geometry*intensity*visibility; 
-      }
-      
-      if(radiance[k]!=0){
-	errorTest += abs(radiance[k]-radianceTest[k])/radiance[k];
-      }
+    radianceTest=0;
+    for(vector<Light>::iterator it = cut.begin();it !=cut.end();it++){
+      Light light = *it;
+      Vec3f wi = (light.getPos()-v.p);
+      float geometry = 1 / (wi.length())*(wi.length());
+      float intensity = light.getIntensity();
+      float visibility = (result[vertex])[light.getIndex()];
+      radianceTest += geometry*intensity*visibility; 
     }
-    /******** 
-	      allLightCuts.push_back(cut);
-	      }
-	      FERMER LA BOUCLE DU FOR POUR CHAQUE************/
-    cout << "erreurTest :"<<errorTest<<endl;
-    
+      
+    if(radiance!=0){
+      errorTest += abs(radiance-radianceTest)/radiance;
+    }
   }
 
-    
-  for(vector<Light>::iterator it = cut.begin(); it != cut.end(); it++){
-    cout << "*** Light " << (*it).getIndex() << " ***"<<endl;
-    cout << "Pos       : " << (*it).getPos() << endl; 
-    cout << "Intensity : " << (*it).getIntensity() << endl;
-    cout << "Dir       : " << (*it).getDir() << endl;
-    cout << "Angle     : " << (*it).getAngle() << endl;
+  int * visible = new int[lightTable.size()];
+  for(unsigned int k = 0;k<lightTable.size();k++){
+    visible[k]=0;
   }
+
+  for(vector<Light>::iterator it = cut.begin();it !=cut.end();it++){
+    visible[(*it).getIndex()] = 1;
+  }
+
+  return visible;
+
 }

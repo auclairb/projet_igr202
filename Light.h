@@ -12,18 +12,18 @@ class Light{
   float intensity;
   Vec3f dir;
   Vec3f angle;
-  float index;
+  int index;
 
  public:
   Light(){};
-  Light(Vec3f,float,Vec3f,Vec3f);
+  Light(Vec3f,float,Vec3f,Vec3f,float);
   virtual ~Light(){};
   Vec3f getPos()const;
   float getIntensity()const;
   void setIntensity(float);
   Vec3f getDir()const;
   Vec3f getAngle()const;
-  float getIndex()const;
+  int getIndex()const;
   bool isEqual(Light) const;
 };
 #endif

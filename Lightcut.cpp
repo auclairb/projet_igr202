@@ -42,12 +42,12 @@ void Lightcut::allIntersects(Mesh& mesh, const vector<Light> & lightTable, int *
   }
 }
 
-/*
+
 void Lightcut::buildLightcut(ltuplist & clusterTable, Mesh& mesh, const vector<Light> & lightTable, float error){
   this->allIntersects(mesh, lightTable, result);
   ltuplist clusterTableCopy = clusterTable;
   int * radiance = new int[mesh.V.size()];
-  float errorTest = 0;
+  float errorTest = 0.0f;
 
   for(unsigned int k = 0; k<mesh.V.size();k++){
     radiance[k]=0;
@@ -71,15 +71,15 @@ void Lightcut::buildLightcut(ltuplist & clusterTable, Mesh& mesh, const vector<L
     Vec3f wi = (light.getPos()-v.p);
     float geometry = 1 / (wi.length())*(wi.length());
     float intensity = light.getIntensity();
-    float visibility = (result[k])[j];
+    float visibility = (result[k])[(cut.at(0)).getIndex()];
     if(radiance[k]!=0){
-      errorTest+=(radiance[k]-geometry*intensity*visibiliy)/radiance[k];
+      errorTest += abs(radiance[k]-geometry*intensity*visibility)/radiance[k];
     }
   }
   
   while(errorTest>error && cut.size()!= lightTable.size()){
-    //float errorBound = INFINITY;
-    //float errorRec;
+    float errorBound = INFINITY;
+    float errorRec = 0.0f;
     Light root;
     Light son1;
     Light son2;
@@ -87,13 +87,13 @@ void Lightcut::buildLightcut(ltuplist & clusterTable, Mesh& mesh, const vector<L
     for(vector<Light>::iterator it = cut.begin();it!=cut.end();it++){
       //errorRec=0;
       for(ltuplist::iterator jt = clusterTable.begin(); jt!=clusterTable.end();jt++){
-	if((get<0>(jt)).isEqual(it)){
-
+	Light R, S1, S2;
+	if((get<0>(*jt)).isEqual(*it)){
 	  for(unsigned int k = 0; k<mesh.V.size();k++){
 	    const Vertex & v = mesh.V[k];
-	    Light R = it;
-	    Light S1 = get<1>(jt);
-	    Light S2 = get<2>(jt);
+	    R = *it;
+	    S1 = get<1>(*jt);
+	    S2 = get<2>(*jt);
 
 	    Vec3f wiR = (R.getPos()-v.p);
 	    Vec3f wiS1 = (S1.getPos()-v.p);
@@ -131,7 +131,7 @@ void Lightcut::buildLightcut(ltuplist & clusterTable, Mesh& mesh, const vector<L
     }
 
     for(vector<Light>::iterator it = cut.begin();it!=cut.end();it++){
-      if(root.isEqual(it)){
+      if(root.isEqual(*it)){
 	cut.erase(it);
       }
     }
@@ -140,4 +140,3 @@ void Lightcut::buildLightcut(ltuplist & clusterTable, Mesh& mesh, const vector<L
     errorTest -=errorBound;
   }
 }
-*/

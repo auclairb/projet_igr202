@@ -30,7 +30,7 @@ vector<Light> LightTree::listToVec(const list<Light> & liste){
 
 
 ///Function that builds a light Tree
-void LightTree::createLightTree(const vector<Light> & lightTable){ 
+ltuplist LightTree::createLightTree(const vector<Light> & lightTable){ 
   vector<Light> lightTable1 = lightTable;
   //get Neighbours table
   ftuplist distTable = createNeighboursTable(lightTable1);

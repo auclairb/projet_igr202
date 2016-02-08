@@ -22,7 +22,8 @@
 #include "Mesh.h"
 #include "Ray.h"
 #include "Lightcut.h"
-
+#include "Light.h"
+#include "LightTree.h"
 #include "tiny_obj_loader.h"
 
 using namespace std;
@@ -39,15 +40,28 @@ static bool fullScreen = false;
 static Camera camera;
 static Mesh mesh;
 //Adding new static variables
-static Vec3f lightPos(3.0f,0.0f,0.0f);
+static Vec3f lightV0(3.0f,0.0f,0.0f);
+static Vec3f lightV1(10.0f,10.0f,10.0f);
+static Vec3f lightV2(-10.0f,10.0f,-10.0f);
+static Vec3f lightV3(10.0f,-10.0f,10.0f);
+static Vec3f nul(0.0f,0.0f,0.0f);
+
+static Light light0(lightV0,20.0f,nul,nul,0);
+static Light light1(lightV1,1.0f,nul,nul,1);
+static Light light2(lightV2,10.0f,nul,nul,2);
+static Light light3(lightV3,12.0f,nul,nul,3);
+
+static const vector<Light> lightTable{light0,light1,light2,light3};
+
 static Vec3f kd (0.9f,0.5f,0.1f);
 //static float ks = 1.0f;
 //static float s = 10.0f;
 static float alpha = 0.1f;  //rugosité 0 =< alpha =< 1
 static float F0 = 0.03f; //Terme de Fresnel [0.02, 0.05] plastique [0.91,0.92] alu
 int* result;
-int* test;
-//Lightcut * lightcut = new Lightcut();
+static LightTree * lightTree = new LightTree();
+static Lightcut * lightcut = new Lightcut();
+static float cutsError = 0.05f;
 
 //tinyobj variables
 static std::string inputfile = "sibenik.obj";
@@ -148,7 +162,10 @@ void init (const char * modelFilename) {
     //loads texture
     
     camera.resize (DEFAULT_SCREENWIDTH, DEFAULT_SCREENHEIGHT);   
-    //lightcut->allIntersects(mesh);
+
+    //Build light Tree/cluster table
+    ltuplist clusterTable = lightTree->createLightTree(lightTable);
+    lightcut->buildLightcut(clusterTable,mesh,lightTable,cutsError);
 }
  
 

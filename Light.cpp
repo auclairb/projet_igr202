@@ -5,11 +5,12 @@ extern Light * lightTable;
 
 using namespace std;
 
-Light::Light(Vec3f _pos, float _intensity, Vec3f  _coneDir, Vec3f _coneAngle){
+Light::Light(Vec3f _pos, float _intensity, Vec3f  _coneDir, Vec3f _coneAngle, float _index){
   this->pos = _pos;
   this->intensity = _intensity;
   this->dir = _coneDir;
   this->angle = _coneAngle;
+  this->index = _index;
 }
 
 Vec3f Light::getPos()const{
@@ -29,17 +30,15 @@ Vec3f Light::getDir() const{
 Vec3f Light::getAngle() const{
   return this->angle;
 }
-float Light::getIndex() const{
+int Light::getIndex() const{
   return this->index;
 }
 
 bool Light::isEqual(Light light) const {
   if (this->getPos()==light.getPos()){
-    if (this->getIntensity()==light.getIntensity()){
-      if (this->getDir()==light.getDir()){
-	if(this->getAngle()==light.getAngle()){
-	  return true;
-	}
+    if (this->getDir()==light.getDir()){
+      if(this->getAngle()==light.getAngle()){
+	return true;
       }
     }
   }

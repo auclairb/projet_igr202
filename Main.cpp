@@ -190,6 +190,8 @@ void drawScene () {
     for (unsigned int i = 0; i < mesh.T.size (); i++) 
     {
         //material configurations
+      if (materials.size() > 0)
+	{
 	int mat_id = material_ids[i];
 	GLfloat amb[4] = {materials[mat_id].ambient[0], materials[mat_id].ambient[1], materials[mat_id].ambient[2], 1.f };
 	GLfloat diff[4] = {materials[mat_id].diffuse[0], materials[mat_id].diffuse[1], materials[mat_id].diffuse[2], 1.f };
@@ -201,7 +203,7 @@ void drawScene () {
 	glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, spec);
 	glMaterialfv(GL_FRONT_AND_BACK, GL_EMISSION, emi);
 	glMaterialfv(GL_FRONT_AND_BACK, GL_SHININESS, shin);
-	
+	}
         for (unsigned int j = 0; j < 3; j++) {
             const Vertex & v = mesh.V[mesh.T[i].v[j]];
             
@@ -213,10 +215,9 @@ void drawScene () {
             w0 = w0 - v.p;
             w0.normalize();
             Ray ray = Ray(v.p,w0);
-	    
+
 	    for (unsigned int lightInd = 0; lightInd < lightTable.size(); lightInd++)
 	    {
-	      
 	      if(result[mesh.T[i].v[j]][lightInd] ){ //Uses a int** where the index in the second array corresponds to the index of the light in lightTable
 		  glColor3f (0.0f, 0.0f, 0.0f);
 	      }
@@ -259,10 +260,11 @@ void drawScene () {
 		  total_radiance +=  max(0.0f,dot(wi,v.n))*(kd/M_PI + fs );
 	      }
 	    }
-            
             glColor3f (total_radiance[0], total_radiance[1], total_radiance[2]);
-            glTexCoord2d(cuv[3*i + j].first,cuv[3*i + j].second); //Specifies texture coordinates to be used
-            glNormal3f (v.n[0], v.n[1], v.n[2]); // Specifies current normal vertex   
+	    if(cuv.size()>0){
+	      glTexCoord2d(cuv[3*i + j].first,cuv[3*i + j].second); //Specifies texture coordinates to be used
+	    }
+	    glNormal3f (v.n[0], v.n[1], v.n[2]); // Specifies current normal vertex   
             glVertex3f (v.p[0], v.p[1], v.p[2]); // Emit a vertex (one triangle is emitted each time 3 vertices are emitted)
         }
     }
@@ -352,6 +354,7 @@ int main (int argc, char ** argv) {
     else{
       init(argv[1],argv[2]);
     }
+    cout <<"COUCOU"<<endl;
     glutIdleFunc (idle);
     glutReshapeFunc (reshape);
     glutDisplayFunc (display);

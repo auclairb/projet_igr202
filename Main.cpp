@@ -64,6 +64,7 @@ int** result;
 ltuplist * clusterTable = new ltuplist();
 static LightTree * lightTree = new LightTree();
 static Lightcut * lightcut = new Lightcut();
+static vector< vector<Light> > allLightCuts;
 static float cutsError = 0.05f;
 
 //tinyobj variables
@@ -174,12 +175,10 @@ void init (const char * fileType, const char * modelFilename) {
     else{
       cerr << "NO TYPE DETECTED !!!" <<endl;
     }
-    camera.resize (DEFAULT_SCREENWIDTH, DEFAULT_SCREENHEIGHT);   
-    cout << "IN INIT"<<endl;
+    camera.resize (DEFAULT_SCREENWIDTH, DEFAULT_SCREENHEIGHT);
     //Build light Tree/cluster table
     *clusterTable = lightTree->createLightTree(lightTable);
-    cout << "i know i m right"<<endl;
-    lightcut->buildLightcut(*clusterTable,mesh,lightTable,cutsError);
+    lightcut->buildLightcut(*clusterTable,mesh,lightTable,cutsError,result);
     cout <<"END INIT"<<endl;
 }
  

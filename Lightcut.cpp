@@ -42,7 +42,7 @@ void Lightcut::allIntersects(Mesh& mesh, const vector<Light> & lightTable, int *
 }
 
 
-void Lightcut::buildLightcut(ltuplist & clusterTable, Mesh& mesh, const vector<Light> & lightTable, float error, int ** & result, int vertex){
+int* Lightcut::buildLightcut(ltuplist & clusterTable, Mesh& mesh, const vector<Light> & lightTable, float error, int ** & result, int vertex){
   
   static int lightCutCount = 1;
   cout << "Entering buildLightcut : " << lightCutCount << "th time" << endl;
@@ -150,13 +150,15 @@ void Lightcut::buildLightcut(ltuplist & clusterTable, Mesh& mesh, const vector<L
     }
   }
 
-    
-  for(vector<Light>::iterator it = cut.begin(); it != cut.end(); it++){
-    cout << "*** Light " << (*it).getIndex() << " ***"<<endl;
-    cout << "Pos       : " << (*it).getPos() << endl; 
-    cout << "Intensity : " << (*it).getIntensity() << endl;
-    cout << "Dir       : " << (*it).getDir() << endl;
-    cout << "Angle     : " << (*it).getAngle() << endl;
- }
+  int * visible = new int[lightTable.size()];
+  for(unsigned int k = 0;k<lightTable.size();k++){
+    visible[k]=0;
+  }
+
+  for(vector<Light>::iterator it = cut.begin();it !=cut.end();it++){
+    visible[(*it).getIndex()] = 1;
+  }
+
+  return visible;
 
 }

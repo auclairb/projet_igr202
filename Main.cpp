@@ -42,16 +42,16 @@ static bool fullScreen = false;
 static Camera camera;
 static Mesh mesh;
 //Adding new static variables
-static Vec3f lightV0(-10.0f,0.0f,0.0f);
-static Vec3f lightV1(-5.0f,0.0f,0.0f);
-static Vec3f lightV2(7.0f,0.0f,0.0f);
-static Vec3f lightV3(9.0f,0.0f,0.0f);
-static Vec3f nul(0.0f,0.0f,0.0f);
+static Vec3f lightV0  (-10.0f, 0.0f, 0.0f);
+static Vec3f lightV1  ( -5.0f, 0.0f, 0.0f);
+static Vec3f lightV2  (  7.0f, 0.0f, 0.0f);
+static Vec3f lightV3  (  9.0f, 0.0f, 0.0f);
+static Vec3f nul      (  0.0f, 0.0f, 0.0f);
 
 static Light light0 (lightV0, 20.0f, nul, nul, 0);
-static Light light1(lightV1, 1.0f, nul, nul, 1);
-static Light light2(lightV2, 10.0f, nul, nul, 2);
-static Light light3(lightV3, 12.0f, nul, nul, 3);
+static Light light1 (lightV1, 1.0f, nul, nul, 1);
+static Light light2 (lightV2, 10.0f, nul, nul, 2);
+static Light light3 (lightV3, 12.0f, nul, nul, 3);
 
 static const vector<Light> lightTable{light0,light1,light2,light3};
 

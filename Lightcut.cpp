@@ -48,6 +48,7 @@ void Lightcut::buildLightcut(ltuplist & clusterTable, Mesh& mesh, const vector<L
   cout << "Entering buildLightcut : " << lightCutCount << "th time" << endl;
   lightCutCount++;
   int * radiance = new int[mesh.V.size()];
+  int * radianceTest = new int[mesh.V.size()];
   float errorTest = 0.0f;
 
   for(unsigned int k = 0; k<mesh.V.size();k++){
@@ -66,14 +67,16 @@ void Lightcut::buildLightcut(ltuplist & clusterTable, Mesh& mesh, const vector<L
   vector<Light> cut;
   cut.push_back(get<0>(clusterTable.back()));
   for(unsigned int k = 0; k<mesh.V.size();k++){
+    radianceTest[k]=0;
     const Vertex & v = mesh.V[k];
     Light light = cut.back();
     Vec3f wi = (light.getPos()-v.p);
     float geometry = 1 / (wi.length())*(wi.length());
     float intensity = light.getIntensity();
     float visibility = (result[k])[(cut.at(0)).getIndex()];
+    radianceTest[k]+=geometry*intensity*visibility;
     if(radiance[k]!=0){
-      errorTest += abs(radiance[k]-geometry*intensity*visibility)/radiance[k];
+      errorTest+=abs(radiance[k]-radianceTest[k])/radiance[k];
     }
   }
   cout << "errorTest = " << errorTest << endl;
@@ -96,7 +99,7 @@ void Lightcut::buildLightcut(ltuplist & clusterTable, Mesh& mesh, const vector<L
       for(ltuplist::iterator jt = clusterTable.begin(); jt!=clusterTable.end();jt++){
 	
 	Light R, S1, S2;
-	if((get<0>(*jt)).isEqual(*it)){
+	if((get<0>(*jt)).isEqual(*it) && (*it).getIntensity() == (get<1>(*jt)).getIntensity() +(get<2>(*jt)).getIntensity() ){
 	  for(unsigned int k = 0; k<mesh.V.size();k++){
 	    const Vertex & v = mesh.V[k];
 	    R = *it;
@@ -148,31 +151,28 @@ void Lightcut::buildLightcut(ltuplist & clusterTable, Mesh& mesh, const vector<L
     cut.push_back(son1);
     cut.push_back(son2);
     errorTest=0;
+    
     for(unsigned int k = 0; k<mesh.V.size();k++){
       const Vertex & v = mesh.V[k];
+      radianceTest[k]=0;
       for(vector<Light>::iterator it = cut.begin();it !=cut.end();it++){
 	Light light = *it;
 	Vec3f wi = (light.getPos()-v.p);
 	float geometry = 1 / (wi.length())*(wi.length());
 	float intensity = light.getIntensity();
 	float visibility = (result[k])[light.getIndex()];
-	if(radiance[k]!=0){
-	  errorTest += abs(radiance[k]-geometry*intensity*visibility)/radiance[k];
-	}
+	radianceTest[k] += geometry*intensity*visibility; 
+      }
+      
+      if(radiance[k]!=0){
+	errorTest += abs(radiance[k]-radianceTest[k])/radiance[k];
       }
     }
 
     cout << "erreurTest :"<<errorTest<<endl;
     
   }
-    for(vector<Light>::const_iterator it = lightTable.begin(); it != lightTable.end(); it++){
-    cout << "*** Light Table n°" << (*it).getIndex() << " ***"<<endl;
-    cout << "Pos       : " << (*it).getPos() << endl; 
-    cout << "Intensity : " << (*it).getIntensity() << endl;
-    cout << "Dir       : " << (*it).getDir() << endl;
-    cout << "Angle     : " << (*it).getAngle() << endl;
-  }
-    cout <<endl;
+
     
   for(vector<Light>::iterator it = cut.begin(); it != cut.end(); it++){
     cout << "*** Light " << (*it).getIndex() << " ***"<<endl;

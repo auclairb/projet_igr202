@@ -12,7 +12,7 @@ typedef list<tuple<Light, Light,Light>> ltuplist;
 
 class LightTree{
  public:
-  LightTree();
+  LightTree(){};
   virtual ~LightTree(){};
   ltuplist createLightTree(const vector<Light> &);
   list<Light> vecToList(const vector<Light> &);

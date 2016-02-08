@@ -11,6 +11,7 @@
 #include <iostream>
 #include <vector>
 #include <string>
+#include <cstring>
 #include <cstdio>
 #include <cstdlib>
 #include <algorithm>
@@ -30,6 +31,7 @@ using namespace std;
 
 static const unsigned int DEFAULT_SCREENWIDTH = 1024;
 static const unsigned int DEFAULT_SCREENHEIGHT = 768;
+static const string DEFAULT_MESH_TYPE ("off");
 static const string DEFAULT_MESH_FILE ("models/man.off");
 
 static string appTitle ("Informatique Graphique & Realite Virtuelle - Travaux Pratiques - Algorithmes de Rendu");
@@ -133,7 +135,7 @@ void printUsage () {
 
 
 
-void init (const char * modelFilename) {
+void init (const char * fileType, const char * modelFilename) {
     glCullFace (GL_BACK);     // Specifies the faces to cull (here the ones pointing away from the camera)
     glEnable (GL_CULL_FACE); // Enables face culling (based on the orientation defined by the CW/CCW enumeration).
     glDepthFunc (GL_LESS); // Specify the depth test for the z-buffer
@@ -145,22 +147,32 @@ void init (const char * modelFilename) {
     glEnable(GL_COLOR_MATERIAL);
     glEnable( GL_TEXTURE_2D );
     
-    //charge l'objet
-    std::string err; 
-    tinyobj::LoadObj(shapes, materials, err, inputfile.c_str());
+    if(strcmp(fileType,"obj")==0){
+      cout << "OBJ TYPE DETECTED" << endl;
+      //charge l'objet
+      std::string err; 
+      tinyobj::LoadObj(shapes, materials, err, inputfile.c_str());
     
-    if (!err.empty()) {
-      std::cerr << err << std::endl;
-      exit(1);
+      if (!err.empty()) {
+	std::cerr << err << std::endl;
+	exit(1);
+      }
+
+      //OLD = mesh.loadOFF(modelFilename)
+      mesh.loadOBJMesh (shapes, material_ids, cuv);
+      //charge l'objet
+    
+      //loads texture
+      loadImageCustom(texturefile.c_str());
+      //loads texture
     }
-	
-    mesh.loadOBJMesh (shapes, material_ids, cuv);
-    //charge l'objet
-    
-    //loads texture
-    loadImageCustom(texturefile.c_str());
-    //loads texture
-    
+    else if(strcmp(fileType,"off")==0){
+      cout<< "OFF  TYPE DETECTED" << endl;
+      mesh.loadOFF(modelFilename);
+    }
+    else{
+      cerr << "NO TYPE DETECTED !!!" <<endl;
+    }
     camera.resize (DEFAULT_SCREENWIDTH, DEFAULT_SCREENHEIGHT);   
 
     //Build light Tree/cluster table
@@ -192,7 +204,7 @@ void drawScene () {
             const Vertex & v = mesh.V[mesh.T[i].v[j]];
             
             // EXERCISE : the following color response shall be replaced with a proper reflectance evaluation/shadow test/etc.
-            float total_radiance = 0.0;
+            Vec3f total_radiance = Vec3f(0.0f);
 	    float w0f[3] = {0.0f,0.0f,0.0f};
             camera.getPos(w0f[0],w0f[1],w0f[2]);
             Vec3f w0(w0f[0],w0f[1],w0f[2]);
@@ -200,7 +212,7 @@ void drawScene () {
             w0.normalize();
             Ray ray = Ray(v.p,w0);
 	    
-	    for (int lightInd = 0; lightInd < lightTable.size(); lightInd++)
+	    for (unsigned int lightInd = 0; lightInd < lightTable.size(); lightInd++)
 	    {
 	      
 	      if(result[mesh.T[i].v[j]][lightInd] ){ //Uses a int** where the index in the second array corresponds to the index of the light in lightTable
@@ -242,11 +254,11 @@ void drawScene () {
 			  
 		  //Resulting
 		  Vec3f fsVec(fs);
-		  float total_radiance += max(0.0f,dot(wi,v.n))*(kd/M_PI + fs );
+		  total_radiance +=  max(0.0f,dot(wi,v.n))*(kd/M_PI + fs );
 	      }
 	    }
             
-            glColor3f (total_radiance, total_radiance, total_radiance);
+            glColor3f (total_radiance[0], total_radiance[1], total_radiance[2]);
             glTexCoord2d(cuv[3*i + j].first,cuv[3*i + j].second); //Specifies texture coordinates to be used
             glNormal3f (v.n[0], v.n[1], v.n[2]); // Specifies current normal vertex   
             glVertex3f (v.p[0], v.p[1], v.p[2]); // Emit a vertex (one triangle is emitted each time 3 vertices are emitted)
@@ -320,7 +332,7 @@ void idle () {
 }
 
 int main (int argc, char ** argv) {
-    if (argc > 2) {
+    if (argc > 3) {
         printUsage ();
         exit (1);
     }
@@ -328,7 +340,16 @@ int main (int argc, char ** argv) {
     glutInitDisplayMode (GLUT_RGBA | GLUT_DEPTH | GLUT_DOUBLE);
     glutInitWindowSize (DEFAULT_SCREENWIDTH, DEFAULT_SCREENHEIGHT);
     window = glutCreateWindow (appTitle.c_str ());
-    init (argc == 2 ? argv[1] : DEFAULT_MESH_FILE.c_str ());
+    //Changing init input to enable both OFF and TINYOBJ renderings
+
+    if(argc !=3){
+      cerr << "Warning : call structure has changed as follow :" << endl;
+      cerr << "main [mesh_type] [filename]" << endl;
+      init(DEFAULT_MESH_TYPE.c_str(), DEFAULT_MESH_FILE.c_str ());
+    }
+    else{
+      init(argv[1],argv[2]);
+    }
     glutIdleFunc (idle);
     glutReshapeFunc (reshape);
     glutDisplayFunc (display);

@@ -186,6 +186,7 @@ void init (const char * fileType, const char * modelFilename) {
   lightcut->allIntersects(mesh,lightTable,result);
   
   for(unsigned int k = 0; k<mesh.V.size();k++){
+    cutPath[k] = new int[lightTable.size()];
     cutPath[k] = lightcut->buildLightcut(*clusterTable,mesh,lightTable,cutsError,k,result);
   }
 }

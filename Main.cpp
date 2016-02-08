@@ -60,7 +60,8 @@ static Vec3f kd (0.9f,0.5f,0.1f);
 //static float s = 10.0f;
 static float alpha = 0.1f;  //rugosité 0 =< alpha =< 1
 static float F0 = 0.03f; //Terme de Fresnel [0.02, 0.05] plastique [0.91,0.92] alu
-int** result;
+static int** result;
+static int ** cutPath;
 ltuplist * clusterTable = new ltuplist();
 static LightTree * lightTree = new LightTree();
 static Lightcut * lightcut = new Lightcut();
@@ -179,7 +180,10 @@ void init (const char * fileType, const char * modelFilename) {
   camera.resize (DEFAULT_SCREENWIDTH, DEFAULT_SCREENHEIGHT);
   //Build light Tree/cluster table
   *clusterTable = lightTree->createLightTree(lightTable);
-  lightcut->buildLightcut(*clusterTable,mesh,lightTable,cutsError,result,1);
+  lightcut->allIntersects(mesh,lightTable,result);
+  for(unsigned int k = 0; k<mesh.V.size();k++){
+    cutPath[k] = lightcut->buildLightcut(*clusterTable,mesh,lightTable,cutsError,k,result);
+  }
 }
  
 

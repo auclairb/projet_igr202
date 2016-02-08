@@ -3,16 +3,15 @@
 #include "Vec3.h"
 
 using namespace std;
-//extern int ** result;
-extern int * test;
+
 //static int N; used for AO
 typedef list<tuple<Light,Light,Light>> ltuplist;
 
-void Lightcut::allIntersects(Mesh& mesh, const vector<Light> & lightTable, int ** & result){
-  result = new int*[mesh.V.size()];
+void Lightcut::allIntersects(Mesh& mesh, const vector<Light> & lightTable, int ** & tab){
+  tab = new int*[mesh.V.size()];
   for (unsigned int i = 0; i < mesh.V.size (); i++){
     int index = 0;
-    result[i]=new int[lightTable.size()];        
+    tab[i]=new int[lightTable.size()];        
     const Vertex & v = mesh.V[i];
     for(vector<Light>::const_iterator it = lightTable.begin(); it!=lightTable.end();it++,index++){
       Vec3f wi = (it->getPos()-v.p);
@@ -20,21 +19,21 @@ void Lightcut::allIntersects(Mesh& mesh, const vector<Light> & lightTable, int *
       Ray ray = Ray(v.p,wi);
 
       if(ray.intersects(mesh)){
-	(result[i])[index] = 1;
+	(tab[i])[index] = 1;
       }
       else {
-	(result[i])[index] = 0;
+	(tab[i])[index] = 0;
 	//What is following was for AO
-	/*Vec3f result(0.0f,0.0f,0.0f) ;
-	  result = cartesianToPolar(v.n);
+	/*Vec3f tab(0.0f,0.0f,0.0f) ;
+	  tab = cartesianToPolar(v.n);
 	  for (int i=0; i<N; i++){
-	  float theta = result[1] + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX/M_PI/2));
-	  float phi = result[2] + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX/(2*M_PI)));
+	  float theta = tab[1] + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX/M_PI/2));
+	  float phi = tab[2] + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX/(2*M_PI)));
 	  Vec3f randDir (1.0f,theta,phi);
 	  randDir = polarToCartesian(randDir);
 	  Ray randRay = Ray(v.p, randDir);
 	  if(randRay.intersects(mesh)){
-	  result[i] += 1/N;
+	  tab[i] += 1/N;
 	  }*/
       }
     }
@@ -42,7 +41,7 @@ void Lightcut::allIntersects(Mesh& mesh, const vector<Light> & lightTable, int *
 }
 
 
-int* Lightcut::buildLightcut(ltuplist & clusterTable, Mesh& mesh, const vector<Light> & lightTable, float error, int ** & result, int vertex){
+int* Lightcut::buildLightcut(ltuplist & clusterTable, Mesh& mesh, const vector<Light> & lightTable, float error,unsigned int vertex, int ** & result){
   
   static int lightCutCount = 1;
   cout << "Entering buildLightcut : " << lightCutCount << "th time" << endl;

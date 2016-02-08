@@ -3,7 +3,7 @@
 #include "Vec3.h"
 
 using namespace std;
-extern int * * result;
+//extern int * * result;
 extern int * test;
 //static int N; used for AO
 typedef list<tuple<Light,Light,Light>> ltuplist;
@@ -42,7 +42,7 @@ void Lightcut::allIntersects(Mesh& mesh, const vector<Light> & lightTable, int *
 }
 
 
-void Lightcut::buildLightcut(ltuplist & clusterTable, Mesh& mesh, const vector<Light> & lightTable, float error){
+void Lightcut::buildLightcut(ltuplist & clusterTable, Mesh& mesh, const vector<Light> & lightTable, float error, int ** & result){
   this->allIntersects(mesh, lightTable, result);
   static int lightCutCount = 1;
   cout << "Entering buildLightcut : " << lightCutCount << "th time" << endl;
@@ -62,13 +62,18 @@ void Lightcut::buildLightcut(ltuplist & clusterTable, Mesh& mesh, const vector<L
       float visibility = (result[k])[j];
       radiance[k]+=geometry*intensity*visibility;
     }
+    /******CORRECTIF
+	   ne pas fermer le crochet et utiliser la suite. On va faire tourner sur tous les pixels.
+     */
   }
 
   vector<Light> cut;
   cut.push_back(get<0>(clusterTable.back()));
+  /*******Inutile de refaire la boucle de toute facon haha**/
   for(unsigned int k = 0; k<mesh.V.size();k++){
     radianceTest[k]=0;
     const Vertex & v = mesh.V[k];
+    /***********REPRENDRE ICI********/
     Light light = cut.back();
     Vec3f wi = (light.getPos()-v.p);
     float geometry = 1 / (wi.length())*(wi.length());
@@ -168,7 +173,10 @@ void Lightcut::buildLightcut(ltuplist & clusterTable, Mesh& mesh, const vector<L
 	errorTest += abs(radiance[k]-radianceTest[k])/radiance[k];
       }
     }
-
+    /******** 
+	      allLightCuts.push_back(cut);
+	      }
+	      FERMER LA BOUCLE DU FOR POUR CHAQUE************/
     cout << "erreurTest :"<<errorTest<<endl;
     
   }

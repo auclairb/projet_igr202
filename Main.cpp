@@ -58,7 +58,7 @@ static Vec3f kd (0.9f,0.5f,0.1f);
 //static float s = 10.0f;
 static float alpha = 0.1f;  //rugosité 0 =< alpha =< 1
 static float F0 = 0.03f; //Terme de Fresnel [0.02, 0.05] plastique [0.91,0.92] alu
-int* result;
+int** result;
 static LightTree * lightTree = new LightTree();
 static Lightcut * lightcut = new Lightcut();
 static float cutsError = 0.05f;
@@ -192,56 +192,61 @@ void drawScene () {
             const Vertex & v = mesh.V[mesh.T[i].v[j]];
             
             // EXERCISE : the following color response shall be replaced with a proper reflectance evaluation/shadow test/etc.
-            float w0f[3] = {0.0f,0.0f,0.0f};
+            float total_radiance = 0.0;
+	    float w0f[3] = {0.0f,0.0f,0.0f};
             camera.getPos(w0f[0],w0f[1],w0f[2]);
             Vec3f w0(w0f[0],w0f[1],w0f[2]);
             w0 = w0 - v.p;
             w0.normalize();
             Ray ray = Ray(v.p,w0);
+	    
+	    for (int lightInd = 0; lightInd < lightTable.size(); lightInd++)
+	    {
+	      
+	      if(result[mesh.T[i].v[j]][lightInd] ){ //Uses a int** where the index in the second array corresponds to the index of the light in lightTable
+		  glColor3f (0.0f, 0.0f, 0.0f);
+	      }
+	      else {
+		  Vec3f wi = (lightTable[lightInd].getPos()-v.p);
+		  wi.normalize();
+		  Vec3f wH = w0 + wi;
+		  wH.normalize();  
+		  float fs = 0.0f;
+		  
+		  // Implementing Lambert
+		  //float color = max(0.0f,dot(wi,v.n))*(kd/M_PI);
+		  
+		  //Implementing Blinn-Phong
+		  //fs = pow( ks*dot(wH,v.n), s);
+			  
+		  //Implementing Cook-Torrance
+		  /*
+		    float expTerm = (pow(dot(v.n,wH),2) - 1) / (pow(alpha,2)*pow(dot(v.n,wH),2));
+		    float inv = M_PI*pow(alpha,2)*pow(dot(v.n,wH),4); 
+		    float D = 1/(inv)*exp(expTerm); 
+		    float F = F0 + (1 - F0) * pow(1 - max(0.0f,dot(wi,wH)),5);
+		    float gShadow = (2*dot(v.n,wH)*dot(v.n,wi)) / dot(w0,wH);
+		    float gMask =   (2*dot(v.n,wH)*dot(v.n,w0)) / dot(w0,wH);
+		    float G = min(1.0f,gShadow);
+		    G = min(G,gMask);
+		    fs = (D*F*G)/ (4*dot(v.n,wi)*dot(v.n,w0));
+		  */
+			  
+		  //Implementing GGX
+		  float Dx = pow(alpha,2) / (M_PI * pow(1+(pow(alpha,2)-1)*pow(dot(v.n,wH),2),2));
+		  float Fx = F0 + (1 - F0) * pow(1 - max(0.0f,dot(wi,wH)),5);
+		  float Gi = 2*dot(v.n,wi) / (  dot(v.n,wi) + sqrt( pow(alpha,2) + (1 - pow(alpha,2))*pow(dot(v.n,wi),2) )  );
+		  float G0 = 2*dot(v.n,w0) / (  dot(v.n,w0) + sqrt( pow(alpha,2) + (1 - pow(alpha,2))*pow(dot(v.n,w0),2) )  );
+		  float Gx = Gi*G0;
+		  fs = (Dx*Fx*Gx)/ (4*dot(v.n,wi)*dot(v.n,w0));
+			  
+		  //Resulting
+		  Vec3f fsVec(fs);
+		  float total_radiance += max(0.0f,dot(wi,v.n))*(kd/M_PI + fs );
+	      }
+	    }
             
-            if(result[mesh.T[i].v[j]] ){
-                glColor3f (0.0f, 0.0f, 0.0f);
-            }
-            else {
-                Vec3f wi = (lightPos-v.p);
-                wi.normalize();
-                Vec3f wH = w0 + wi;
-                wH.normalize();  
-                float fs = 0.0f;
-                
-                // Implementing Lambert
-                //float color = max(0.0f,dot(wi,v.n))*(kd/M_PI);
-                
-                //Implementing Blinn-Phong
-                //fs = pow( ks*dot(wH,v.n), s);
-			
-		//Implementing Cook-Torrance
-		/*
-		  float expTerm = (pow(dot(v.n,wH),2) - 1) / (pow(alpha,2)*pow(dot(v.n,wH),2));
-		  float inv = M_PI*pow(alpha,2)*pow(dot(v.n,wH),4); 
-		  float D = 1/(inv)*exp(expTerm); 
-		  float F = F0 + (1 - F0) * pow(1 - max(0.0f,dot(wi,wH)),5);
-		  float gShadow = (2*dot(v.n,wH)*dot(v.n,wi)) / dot(w0,wH);
-		  float gMask =   (2*dot(v.n,wH)*dot(v.n,w0)) / dot(w0,wH);
-		  float G = min(1.0f,gShadow);
-		  G = min(G,gMask);
-		  fs = (D*F*G)/ (4*dot(v.n,wi)*dot(v.n,w0));
-		*/
-			
-		//Implementing GGX
-		float Dx = pow(alpha,2) / (M_PI * pow(1+(pow(alpha,2)-1)*pow(dot(v.n,wH),2),2));
-		float Fx = F0 + (1 - F0) * pow(1 - max(0.0f,dot(wi,wH)),5);
-		float Gi = 2*dot(v.n,wi) / (  dot(v.n,wi) + sqrt( pow(alpha,2) + (1 - pow(alpha,2))*pow(dot(v.n,wi),2) )  );
-		float G0 = 2*dot(v.n,w0) / (  dot(v.n,w0) + sqrt( pow(alpha,2) + (1 - pow(alpha,2))*pow(dot(v.n,w0),2) )  );
-		float Gx = Gi*G0;
-		fs = (Dx*Fx*Gx)/ (4*dot(v.n,wi)*dot(v.n,w0));
-			
-		//Resulting
-		Vec3f fsVec(fs);
-		Vec3f color = max(0.0f,dot(wi,v.n))*(kd/M_PI + fs );
-		glColor3f (color[0], color[1], color[2]);
-            }
-            
+            glColor3f (total_radiance, total_radiance, total_radiance);
             glTexCoord2d(cuv[3*i + j].first,cuv[3*i + j].second); //Specifies texture coordinates to be used
             glNormal3f (v.n[0], v.n[1], v.n[2]); // Specifies current normal vertex   
             glVertex3f (v.p[0], v.p[1], v.p[2]); // Emit a vertex (one triangle is emitted each time 3 vertices are emitted)
